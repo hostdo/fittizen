@@ -1,0 +1,51 @@
+<?php
+/**
+ * @version		$Id: controller.php 15 2009-11-02 18:37:15Z chdemko $
+ * @package		Joomla16.Tutorials
+ * @subpackage	Components
+ * @copyright	Copyright (C) 2005 - 2010 Open Source Matters, Inc. All rights reserved.
+ * @author		Christophe Demko
+ * @link		http://joomlacode.org/gf/project/helloworld_1_6/
+ * @license		License GNU General Public License version 2 or later
+ */
+
+// No direct access to this file
+defined('_JEXEC') or die('Restricted access');
+
+// import Joomla controller library
+jimport('joomla.application.component.controller');
+
+/**
+ * Component Controller
+ */
+class FittizenController extends JControllerLegacy
+{
+        public function find_locations()
+        {
+            $needle = filter_input(INPUT_GET, 'address');
+            $objs=array();
+            if($needle != "")
+            {
+                $objs=  bll_locations::find_locations($needle, 
+                        false,'address');
+            }
+            ob_clean();
+            header('Content-type: application/json');
+            echo json_encode($objs);
+            exit;
+        }
+        
+        public function validate_profile_code()
+        {
+            $needle = filter_input(INPUT_GET, 'code');
+            $response=false;
+            if($needle != "")
+            {
+                $response= bll_fitinfos::check_profile_code($needle);
+            }
+            ob_clean();
+            header('Content-type: application/json');
+            echo json_encode($response);
+            exit;
+        }
+}
