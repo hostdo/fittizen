@@ -65,9 +65,9 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
         </div>
         <div class="span12">
             <h5><b><?php echo JText::_('COM_FITTIZEN_DAILY_VISITS_AVERAGES');?></b></h5>
-            <p><?php echo JText::_('COM_FITTIZEN_TRAINERS');?>: <?php echo count($trainer->findAll()); ?> </p>
-            <p><?php echo JText::_('COM_FITTIZEN_FITTIZENS');?>: <?php echo count($fittizen->findAll()); ?> </p>
-            <p><?php echo JText::_('COM_FITTIZEN_TOTAL');?>: <?php echo count($fitinfo->findAll()); ?> </p>
+            <p><?php echo JText::_('COM_FITTIZEN_TRAINERS');?>: <?php echo $averages[1]; ?> </p>
+            <p><?php echo JText::_('COM_FITTIZEN_FITTIZENS');?>: <?php echo $averages[0]; ?> </p>
+            <p><?php echo JText::_('COM_FITTIZEN_TOTAL');?>: <?php echo $averages[2]; ?> </p>
         </div>
   </div>
   <div id="tabs-2">
