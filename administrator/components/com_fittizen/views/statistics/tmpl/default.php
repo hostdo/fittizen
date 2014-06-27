@@ -73,9 +73,17 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
   <div id="tabs-2">
         <div class="span6">
             <h5><b><?php echo JText::_('COM_FITTIZEN_TOTALS');?></b></h5>
-            <p><?php echo JText::_('COM_FITTIZEN_ADS_CLICKS');?>: <?php echo count($trainer->findAll()); ?> </p>
-            <p><?php echo JText::_('COM_FITTIZEN_ADS_IMPRESSIONS');?>: <?php echo count($fittizen->findAll()); ?> </p>
-            
+            <p><?php echo JText::_('COM_FITTIZEN_ADS_CLICKS');?>: <?php echo bll_ads::get_total_clicks(); ?> </p>
+            <p><?php echo JText::_('COM_FITTIZEN_ADS_IMPRESSIONS');?>: <?php echo bll_ads::get_total_impressions(); ?> </p>            
+        </div>
+        <div class="span6">
+            <h5><b><?php echo JText::_('COM_FITTIZEN_DAILY');?></b></h5>
+            <p><?php echo JText::_('COM_FITTIZEN_ADS_CLICKS');?>: <?php echo bll_ads::get_total_clicks_by_day(); ?> </p>
+            <p><?php echo JText::_('COM_FITTIZEN_ADS_IMPRESSIONS');?>: <?php echo bll_ads::get_total_impressions_by_day(); ?> </p>            
+        </div>
+        <div class="span12">
+            <h5><b><?php echo JText::_('COM_FITTIZEN_ACTIVE_ADS');?></b></h5>
+            <p><?php echo JText::_('COM_FITTIZEN_TRAINERS');?>: <?php echo bll_ads::get_active_ads(); ?> </p>
         </div>
   </div>
   <div id="tabs-3">
