@@ -5,6 +5,7 @@
         <group>
             <file>file:/C:/wamp/www/fittizen_base/trunk/administrator/components/com_fittizen/views/fittizens/tmpl/edit.php</file>
             <file>file:/C:/wamp/www/fittizen_base/trunk/administrator/components/com_fittizen/controller.php</file>
+            <file>file:/C:/wamp/www/fittizen_base/trunk/administrator/components/com_fittizen/views/statistics/tmpl/default.php</file>
         </group>
     </open-files>
 </project-private>
