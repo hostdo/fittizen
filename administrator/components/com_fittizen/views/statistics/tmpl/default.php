@@ -10,11 +10,69 @@ $fitinfo = new bll_fitinfos(-1);
 $trainer = new bll_trainers(-1);
 $fittizen=new bll_fittizens(-1);
 $date = AuxTools::DateTimeCurrentString("Y-m-d");
+$active_tab = 0;
+$gender_id = null;
+$suppl_id = null;
+$nicho_id = null;
+$gym_id=null;
+$city="";
+$birth_date="";
+$rate="1 , 10";
+$averages = bll_fitinfos::get_average_visits('2014-01-01', 'now');
+AuxTools::printr(filter_input_array(INPUT_POST));
 if(filter_has_var(INPUT_POST, 'date'))
 {
     $date = filter_input(INPUT_POST, 'date');
 }
-$averages = bll_fitinfos::get_average_visits('2014-01-01', 'now');
+if(filter_has_var(INPUT_POST, 'rate'))
+{
+    $rate = filter_input(INPUT_POST, 'rate');
+}
+if(filter_has_var(INPUT_POST, 'birth_date'))
+{
+    $birth_date = filter_input(INPUT_POST, 'birth_date');
+}
+if(filter_has_var(INPUT_POST, 'user'))
+{
+    $active_tab=2;
+}
+if(filter_has_var(INPUT_POST, 'city'))
+{
+    $city = filter_input(INPUT_POST, 'city');
+}
+
+if(filter_has_var(INPUT_POST, 'gender_id'))
+{
+    $gender_id = filter_input(INPUT_POST, 'gender_id');
+}
+if(filter_has_var(INPUT_POST, 'suppl_id'))
+{
+    $suppl_id = filter_input(INPUT_POST, 'suppl_id');
+}
+if(filter_has_var(INPUT_POST, 'nicho_id'))
+{
+    $nicho_id = filter_input(INPUT_POST, 'nicho_id');
+}
+if(filter_has_var(INPUT_POST, 'gym_id'))
+{
+    $gym_id = filter_input(INPUT_POST, 'gym_id');
+}
+$nicho = new fittizen_nichos_lang(-1);
+$nichos = $nicho->findAll('lang_id', $language->lang_id);
+$nichos = dbobject::convertListToHash($nichos,'nicho_id', 'name', $nicho_id,true);
+
+$gym = new fittizen_gyms_lang(-1);
+$gyms = $gym->findAll('lang_id', $language->lang_id);
+$gyms = dbobject::convertListToHash($gyms,'gym_id', 'name', $gym_id,true);
+
+$supl = new fittizen_supplements_lang(-1);
+$supls = $supl->findAll('lang_id', $language->lang_id);
+$supls = dbobject::convertListToHash($supls,'supplement_id', 'name', $suppl_id,true);
+
+$gender = new fittizen_gender_lang(-1);
+$genders = $gender->findAll('lang_id', $language->lang_id);
+$genders = dbobject::convertListToHash($genders,'gender_id', 'name', $gender_id,true);
+
 ?>
 <script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
 <script type="text/javascript" src="<?php echo $jspath . LIBS . JS . DATE_TIME_JS; ?>"></script>
@@ -23,7 +81,80 @@ $averages = bll_fitinfos::get_average_visits('2014-01-01', 'now');
 <link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . DATE_TIME_CSS; ?>" />
 <script>  
   $(function() {
-    $( "#tabs" ).tabs();
+    $( "#tabs" ).tabs({active:<?php echo $active_tab; ?>});
+    
+    $( "#city" ).autocomplete({
+          source: function( request, response ) {
+            $.ajax({
+              url:"<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_city&format=json", 
+              data:{city:$("#city").val()},
+              dataType:"json",
+              success: function( data ) {
+                response( $.map( data, function( item ) {
+                  return {
+                    label: item.locality,
+                    value: item.id
+                  }
+                }));
+              }
+            });
+          },
+          minLength: 2,
+          open: function() {
+            $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+          },
+          close: function() {
+            $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+          },
+          select: function( event, ui ) {
+            $("#city").val(ui.item.label);
+            $("#city_id").val(ui.item.value);
+            event.stopPropagation();
+            return false;
+          }
+        });
+        
+        $( "#country" ).autocomplete({
+          source: function( request, response ) {
+            $.ajax({
+              url:"<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_country&format=json", 
+              data:{country:$("#country").val()},
+              dataType:"json",
+              success: function( data ) {
+                response( $.map( data, function( item ) {
+                  return {
+                    label: item.country,
+                    value: item.id
+                  }
+                }));
+              }
+            });
+          },
+          minLength: 2,
+          open: function() {
+            $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+          },
+          close: function() {
+            $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+          },
+          select: function( event, ui ) {
+            $("#country").val(ui.item.label);
+            $("#country_id").val(ui.item.value);
+            event.stopPropagation();
+            return false;
+          }
+        });
+        $( "#slider-range" ).slider({
+      range: true,
+      min: 1,
+      max: 10,
+      values: [<?php echo $rate ?>],
+      slide: function( event, ui ) {
+        $( "#amount" ).val( "" + ui.values[ 0 ] + " , " + ui.values[ 1 ] );
+      }
+    });
+    $( "#amount" ).val( "" + $( "#slider-range" ).slider( "values", 0 ) +
+      " , " + $( "#slider-range" ).slider( "values", 1 ) );
   });
 </script>
 <h3>
@@ -87,6 +218,42 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
         </div>
   </div>
   <div id="tabs-3">
+      <h5><b><?php echo JText::_('COM_FITTIZEN_FILTER_USERS');?></b></h5>
+      <?php 
+      $form = Form::getInstance();
+      $form->setLayout(FormLayouts::FORMS_UL_LAYOUT);
+      $form->Hidden('user', 1);
+      
+      $form->Label(JText::_('COM_FITTIZEN_GENDER'), 'gender_id');
+      $form->SelectBox('gender_id', $genders);
+      
+      $form->Label(JText::_('COM_FITTIZEN_NICHOS'), 'nicho_id');
+      $form->SelectBox('nicho_id', $nichos);
+      
+      $form->Label(JText::_('COM_FITTIZEN_SUPPLEMENTS'), 'suppl_id');
+      $form->SelectBox('suppl_id', $supls);
+      
+      $form->Label(JText::_('COM_FITTIZEN_CITY'), 'city');
+      $form->Text('city', $city, 'city');
+      $form->Label(JText::_('COM_FITTIZEN_COUNTRY'), 'country');
+      $form->Text('country', $city, 'country');
+      
+      $form->Label(JText::_('COM_FITTIZEN_GYMS'), 'gym_id');
+      $form->SelectBox('gym_id', $gyms);
+      
+      $form->Label(JText::_('COM_FITTIZEN_BIRTH_DATE'), 'birth_date');
+      $form->Date('birth_date', $birth_date, 'birth_date');
+      
+      $form->Label(JText::_('COM_FITTIZEN_TRAINER_RATE'), 'rate');
+      $rate_html="<p>
+        <input name=\"rate\" type=\"text\" id=\"amount\" readonly style=\"border:0; color:#f6931f; font-weight:bold;\">
+      </p>
+      <div id=\"slider-range\"></div>";
+      $form->HTML($rate_html);
+      
+      $form->Submit(JText::_('COM_FITTIZEN_FILTER'));
+      echo $form->Render();
+      ?>
   
   </div>
 </div>

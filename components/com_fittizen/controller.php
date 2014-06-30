@@ -35,6 +35,56 @@ class FittizenController extends JControllerLegacy
             exit;
         }
         
+        public function find_country()
+        {
+            $needle = filter_input(INPUT_GET, 'country');
+            $objs=array();
+            $tmp = array();
+            if($needle != "")
+            {
+                $bl = new bll_locations(-1);
+                foreach($bl->findAll(
+                        array(
+                            array('country', 'like')
+                        ), 
+                        array(
+                            array($needle, null)
+                        )) as $obj)
+                {
+                    if(!isset($tmp[$obj->country]))
+                    {
+                        $tmp[$obj->country]=1;
+                        $objs[]=$obj;
+                    }
+                }
+            }
+            ob_clean();
+            header('Content-type: application/json');
+            echo json_encode($objs);
+            exit;
+        }
+        
+        public function find_city()
+        {
+            $needle = filter_input(INPUT_GET, 'city');
+            $objs=array();
+            if($needle != "")
+            {
+                $bl = new bll_locations(-1);
+                $objs=$bl->findAll(
+                        array(
+                            array('locality', 'like')
+                        ), 
+                        array(
+                            array($needle, null)
+                        ));
+            }
+            ob_clean();
+            header('Content-type: application/json');
+            echo json_encode($objs);
+            exit;
+        }
+        
         public function validate_profile_code()
         {
             $needle = filter_input(INPUT_GET, 'code');

@@ -252,5 +252,41 @@ class bll_nichos extends fittizen_nichos
         return $lval->findAll($field,$value,$DESC,
             $order_field,$lower_limit, $upper_limit);
     }
+    
+    /**
+    * Adds a nicho to a content
+    * @param integer $cid content_id
+    * @param integer $nid nicho id
+    * @return fittizen_content_nichos not false on success
+    */
+   public static function add_nicho_content($cid, $nid)
+   {
+       $obj = new fittizen_content_nichos(-1);
+       $obj->content_id = $cid;
+       $obj->nicho_id = $nid;
+       return $obj->insert();
+   }
+   
+   /**
+    * Searchs the nichos from a content
+    * @param integer $cid content_id 
+    * @return fittizen_content_nichos array of dbobject not false on success
+    */
+   public static function get_nichos_content($cid)
+   {
+       $obj = new fittizen_content_nichos(-1);
+       return $obj->findAll('content_id', $cid);
+   }
+   
+   /**
+    * Delete the nichos from a content
+    * @param integer $cid content_id 
+    * @return fittizen_content_nichos not false on success
+    */
+   public static function remove_nichos_content($cid)
+   {
+       $obj = new fittizen_content_nichos(-1);
+       return $obj->delete('content_id', $cid);
+   }
 }
 
