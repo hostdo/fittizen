@@ -15,11 +15,39 @@ $gender_id = null;
 $suppl_id = null;
 $nicho_id = null;
 $gym_id=null;
+$facebook="";
+$type="";
 $city="";
+$country="";
+$limitstart =0;
+if(filter_has_var(INPUT_POST, 'limitstart'))
+{
+    $limitstart = filter_input(INPUT_POST, 'limitstart');
+}
 $birth_date="";
 $rate="1 , 10";
 $averages = bll_fitinfos::get_average_visits('2014-01-01', 'now');
-AuxTools::printr(filter_input_array(INPUT_POST));
+$disabled = "true";
+$data=filter_input_array(INPUT_POST);
+if(filter_has_var(INPUT_POST, 'user'))
+{
+    $active_tab=2;
+    $objs = bll_fitinfos::filter_users($data, true,
+      'id', $limitstart, NUMBER_ELEMENTS_BY_PAGE);
+    $all=(bll_fitinfos::filter_users($data, true,
+      'id'));
+    $total = count($all);
+}
+else {
+    $data=array();
+    $objs = bll_fitinfos::filter_users($data, true,
+      'id', $limitstart, NUMBER_ELEMENTS_BY_PAGE);
+    
+    $all=(bll_fitinfos::filter_users($data, true,
+      'id'));
+    $total = count($all);
+}
+
 if(filter_has_var(INPUT_POST, 'date'))
 {
     $date = filter_input(INPUT_POST, 'date');
@@ -28,17 +56,29 @@ if(filter_has_var(INPUT_POST, 'rate'))
 {
     $rate = filter_input(INPUT_POST, 'rate');
 }
+if(filter_has_var(INPUT_POST, 'facebook'))
+{
+    $facebook = filter_input(INPUT_POST, 'facebook');
+}
+if(filter_has_var(INPUT_POST, 'type'))
+{
+    $type = filter_input(INPUT_POST, 'type');
+    if($type == "2")
+    {
+        $disabled = "false";
+    }
+}
 if(filter_has_var(INPUT_POST, 'birth_date'))
 {
     $birth_date = filter_input(INPUT_POST, 'birth_date');
 }
-if(filter_has_var(INPUT_POST, 'user'))
-{
-    $active_tab=2;
-}
 if(filter_has_var(INPUT_POST, 'city'))
 {
     $city = filter_input(INPUT_POST, 'city');
+}
+if(filter_has_var(INPUT_POST, 'country'))
+{
+    $country = filter_input(INPUT_POST, 'country');
 }
 
 if(filter_has_var(INPUT_POST, 'gender_id'))
@@ -73,6 +113,40 @@ $gender = new fittizen_gender_lang(-1);
 $genders = $gender->findAll('lang_id', $language->lang_id);
 $genders = dbobject::convertListToHash($genders,'gender_id', 'name', $gender_id,true);
 
+
+$facebooks = array("-1"=>"",
+    "1"=>JText::_('COM_FITTIZEN_FACEBOOK'),
+    "2"=>JText::_('COM_FITTIZEN_GPLUS'),
+    "3"=>JText::_('COM_FITTIZEN_TWITTER'));
+$nfacebooks=array();
+foreach($facebooks as $fb=>$val)
+{
+    if($fb == $facebook)
+    {
+        $nfacebooks["#__".$fb]=$val;
+    }
+    else
+    {
+        $nfacebooks[$fb]=$val;
+    }
+}
+$facebooks=$nfacebooks;
+$types = array("-1"=>"",
+    "1"=>JText::_('COM_FITTIZEN_FITTIZEN'),
+    "2"=>JText::_('COM_FITTIZEN_TRAINER'),);
+$ntypes = array();
+foreach($types as $key=>$val)
+{
+    if($key == $type)
+    {
+        $ntypes["#__".$key]=$val;
+    }
+    else
+    {
+        $ntypes[$key]=$val;
+    }
+}
+$types = $ntypes;
 ?>
 <script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
 <script type="text/javascript" src="<?php echo $jspath . LIBS . JS . DATE_TIME_JS; ?>"></script>
@@ -91,6 +165,7 @@ $genders = dbobject::convertListToHash($genders,'gender_id', 'name', $gender_id,
               dataType:"json",
               success: function( data ) {
                 response( $.map( data, function( item ) {
+                    $( "#country" ).val(item.country);
                   return {
                     label: item.locality,
                     value: item.id
@@ -146,6 +221,7 @@ $genders = dbobject::convertListToHash($genders,'gender_id', 'name', $gender_id,
         });
         $( "#slider-range" ).slider({
       range: true,
+      disabled: <?php echo $disabled ?>,
       min: 1,
       max: 10,
       values: [<?php echo $rate ?>],
@@ -223,7 +299,9 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
       $form = Form::getInstance();
       $form->setLayout(FormLayouts::FORMS_UL_LAYOUT);
       $form->Hidden('user', 1);
-      
+      $form->Hidden('paper', 'tabloid');
+      $form->Hidden('html', $report_html);
+      $form->Hidden('orientation', 'portrait');
       $form->Label(JText::_('COM_FITTIZEN_GENDER'), 'gender_id');
       $form->SelectBox('gender_id', $genders);
       
@@ -236,7 +314,7 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
       $form->Label(JText::_('COM_FITTIZEN_CITY'), 'city');
       $form->Text('city', $city, 'city');
       $form->Label(JText::_('COM_FITTIZEN_COUNTRY'), 'country');
-      $form->Text('country', $city, 'country');
+      $form->Text('country', $country, 'country');
       
       $form->Label(JText::_('COM_FITTIZEN_GYMS'), 'gym_id');
       $form->SelectBox('gym_id', $gyms);
@@ -244,16 +322,92 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
       $form->Label(JText::_('COM_FITTIZEN_BIRTH_DATE'), 'birth_date');
       $form->Date('birth_date', $birth_date, 'birth_date');
       
+      $form->Label(JText::_('COM_FITTIZEN_TYPE'), 'type');
+      $form->SelectBox('type', $types);
+      
+      $form->Label(JText::_('COM_FITTIZEN_SYNCED_WITH'), 'facebook');
+      $form->SelectBox('facebook', $facebooks);
+      
       $form->Label(JText::_('COM_FITTIZEN_TRAINER_RATE'), 'rate');
       $rate_html="<p>
         <input name=\"rate\" type=\"text\" id=\"amount\" readonly style=\"border:0; color:#f6931f; font-weight:bold;\">
       </p>
       <div id=\"slider-range\"></div>";
       $form->HTML($rate_html);
-      
+      $form->HTML("<button formmethod=\"post\" type=\"submit\" formaction=\"".$jspath . LIBS ."dompdf".DS."www".DS."demo.php\">".JText::_('COM_FITTIZEN_GENERATE_PDF')."</button>");
       $form->Submit(JText::_('COM_FITTIZEN_FILTER'));
       echo $form->Render();
       ?>
-  
+      <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    <?php 
+                    echo JText::_('COM_FITTIZEN_ID');
+                    ?>
+                </th>
+                <th>
+                    <?php 
+                    echo JText::_('COM_FITTIZEN_NAME');
+                    ?>
+                </th>
+                <th>
+                    <?php 
+                    echo JText::_('COM_FITTIZEN_LOCATION');
+                    ?>
+                </th>
+                <?php if($type == "2"): ?>
+                <th>
+                    <?php 
+                    echo JText::_('COM_FITTIZEN_RATING');
+                    ?>
+                </th>
+                <?php endif; ?>
+                <th>
+                    <?php 
+                    echo JText::_('COM_FITTIZEN_ACTIONS');
+                    ?>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php for($i=0, $row_index=1; $i < count($objs); $i++, $row_index++): 
+                $obj = $objs[$i];
+                $pro = new bll_fitinfos($obj->fitinfo_id);
+                $location = new bll_locations($pro->location_id);
+                ?>
+            <tr class="row<?php echo ($row_index%2) ?>">
+                <td>
+                    <?php echo $obj->id; ?>
+                </td>
+                <td>
+                    <?php echo $pro->name." ".$pro->last_name; ?>
+                </td>
+                <td>
+                    <?php echo $location->address; ?>
+                </td>
+                <?php if($type == "2"): ?>
+                <td>
+                    <?php echo $obj->get_rating(); ?>
+                </td>
+                <?php endif; ?>
+                <td>
+                    <form action="./index.php?option=com_fittizen&view=trainers&layout=edit" method="POST">
+                        <input type="hidden" name="id" value="<?php echo $obj->id; ?>" />
+                        <input type="hidden" name="limitstart" value="<?php echo $limitstart ?>" />
+                        <button class="btn btn-small" type="submit">
+                            <span class="icon-edit"></span>
+                            <?php echo JText::_('COM_FITTIZEN_EDIT'); ?>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <?php endfor; ?>
+        </tbody>
+    </table>
+      <?php echo HtmlGenerator::GeneratePagination('statistics',
+            './index.php?option=com_fittizen&view=statistics', $total, 
+            $limitstart, 
+            NUMBER_ELEMENTS_BY_PAGE, $data); ?>
   </div>
 </div>

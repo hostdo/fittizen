@@ -1932,5 +1932,185 @@ class bll_fitinfos extends fittizen_fitinfos
         }
         return $result;
     }
+    
+    /**
+     * Get the account specificaly as fittizen or trainer
+     * @param integer $fitinfo_id id of the profile to search
+     * @return bll_fittizens|bll_trainers
+     */
+    public static function get_account($fitinfo_id)
+    {
+        $obj =new bll_fittizens(-1);
+        $ret= $obj->find('fitinfo_id', $fitinfo_id);
+        if($ret->id > 0)
+        {
+            return $ret;
+        }
+        $obj =new bll_trainers(-1);
+        $ret= $obj->find('fitinfo_id', $fitinfo_id);
+        if($ret->id > 0)
+        {
+            return $ret;
+        }
+    }
+    
+    /**
+     * Filter the users in the system
+     * 
+     * @param array $params hash of params of the search
+     * @param  boolean $DESC ascendent
+     * @param  string  $order_field Field for the order by
+     * FIT for fittizen_fitinfos tables, FRIEND for 
+     * @param  integer $lower_limit  lower limit on the query, it must be
+     * an integer otherwise is going to be ignored
+     * @param  integer $upper_limit higher limit on the query, it must be
+     * an integer otherwise is going to be ignored
+     * @return bll_fitinfos array of fitinfos
+     */
+    public static function filter_users($params=array(),$DESC=true, 
+            $order_field='id', $lower_limit=null, $upper_limit=null)
+    {
+        $obj = new bll_fitinfos(-1);
+        if(count($params) == 0)
+        {
+            $tresult= $obj->findAll(null,null, $DESC, $order_field, $lower_limit, $upper_limit);
+            $result = array();
+            foreach($tresult as $tres)
+            {
+                $result[]=self::get_account($tres->id);
+            }
+            return $result;
+        }
+        else
+        {
+            $db = new dbprovider(true);
+            $gender_id = null;
+            $suppl_id = null;
+            $nicho_id = null;
+            $gym_id=null;
+            $facebook="";
+            $type="";
+            $city="";
+            $country="";
+            $birth_date="";
+            $rate="";
+            if(filter_has_var(INPUT_POST, 'rate'))
+            {
+                $rate = $db->escape_string(filter_input(INPUT_POST, 'rate'));
+            }
+            if(filter_has_var(INPUT_POST, 'facebook'))
+            {
+                $facebook = $db->escape_string(filter_input(INPUT_POST, 'facebook'));
+            }
+            if(filter_has_var(INPUT_POST, 'type'))
+            {
+                $type = $db->escape_string(filter_input(INPUT_POST, 'type'));
+            }
+            if(filter_has_var(INPUT_POST, 'birth_date'))
+            {
+                $birth_date = $db->escape_string(filter_input(INPUT_POST, 'birth_date'));
+            }
+            if(filter_has_var(INPUT_POST, 'city'))
+            {
+                $city = $db->escape_string(filter_input(INPUT_POST, 'city'));
+            }
+            if(filter_has_var(INPUT_POST, 'country'))
+            {
+                $country = filter_input(INPUT_POST, 'country');
+            }
+            if(filter_has_var(INPUT_POST, 'gender_id'))
+            {
+                $gender_id = $db->escape_string(filter_input(INPUT_POST, 'gender_id'));
+            }
+            if(filter_has_var(INPUT_POST, 'suppl_id'))
+            {
+                $suppl_id = $db->escape_string(filter_input(INPUT_POST, 'suppl_id'));
+            }
+            if(filter_has_var(INPUT_POST, 'nicho_id'))
+            {
+                $nicho_id = $db->escape_string(filter_input(INPUT_POST, 'nicho_id'));
+            }
+            if(filter_has_var(INPUT_POST, 'gym_id'))
+            {
+                $gym_id = $db->escape_string(filter_input(INPUT_POST, 'gym_id'));
+            }
+            $glue = "AND";
+            $query = 'SELECT * FROM `#__fittizen_fitinfos` '
+                    . 'WHERE 1=1 ';
+            if($gender_id > 0)
+            {
+                $query.=" $glue `gender_id`='$gender_id' ";
+            }
+            if($city != "")
+            {
+                $query.=" $glue `location_id` IN (SELECT id FROM `#__fittizen_locations` WHERE `locality` = '$city' AND `country` = '$country')";
+            }
+            if($city == "" && $country != "")
+            {
+                $query.=" $glue `location_id` IN (SELECT id FROM `#__fittizen_locations` WHERE `country` = '$country')";
+            }
+            if($suppl_id > 0)
+            {
+                $query.=" $glue `id` IN (SELECT `fitinfo_id` FROM `#__fittizen_fitinfo_supplement` WHERE `supplement_id` = $suppl_id) ";
+            }
+            if($nicho_id > 0)
+            {
+                $query.=" $glue `id` IN (SELECT `fitinfo_id` FROM `#__fittizen_fitinfo_nichos` WHERE `nicho_id` = $nicho_id) ";
+            }
+            if($gym_id > 0)
+            {
+                $query.=" $glue `id` IN (SELECT `fitinfo_id` FROM `#__fittizen_fitinfo_gyms` WHERE `gym_id` = $gym_id) ";
+            }
+            if($facebook > 0)
+            {
+                switch($facebook)
+                {
+                    case "1":
+                        $query.=" $glue `fb_id` <> NULL ";
+                    break;
+                    case "2":
+                        $query.=" $glue `gplus_id` <> NULL ";
+                    break;
+                    case "3":
+                        $query.=" $glue `twitter_id` <> NULL ";
+                    break;
+                }
+            }
+            
+            if($type > 0)
+            {
+                switch($type)
+                {
+                    case "1":
+                        $query.=" $glue `id` IN (SELECT `fitinfo_id` FROM `#__fittizen_fittizen`) ";
+                    break;
+                    case "2":
+                        $query.=" $glue `id` IN (SELECT `fitinfo_id` FROM `#__fittizen_trainers`) ";
+                    break;
+                }
+            }
+            $order_dir = 'ASC';
+            if($DESC === true)
+            {
+                $order_dir = "DESC";
+            }
+            $limit = "";
+            $order_by = $db->escape_string($order_field);
+            if($lower_limit !== null && $upper_limit !== null)
+            {
+                $lower_limit = $db->escape_string($lower_limit);
+                $upper_limit = $db->escape_string($upper_limit);
+                $limit = " LIMIT $lower_limit,$upper_limit";
+            }
+            $query.=" ORDER BY `$order_by` $order_dir $limit";
+            $db->Query($query);
+            $result=array();
+            foreach($db->getNextObjectList() as $tres)
+            {
+                $result[]=self::get_account($tres->id);
+            }
+            return $result;
+        }
+    }
 }
 

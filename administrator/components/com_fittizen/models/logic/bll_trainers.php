@@ -207,7 +207,14 @@ class bll_trainers extends fittizen_trainers
                $count++;
             }
         }
+        if($count > 0)
+        {
         return $acum/$count;
+        }
+        else
+        {
+            return JText::_('COM_FITTIZEN_N_A');
+        }
     }
     
 }

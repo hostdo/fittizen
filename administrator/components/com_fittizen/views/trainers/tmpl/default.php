@@ -69,6 +69,7 @@ echo JText::_('COM_FITTIZEN_TOTAL').":".$total;
         <tbody>
             <?php for($i=0, $row_index=1; $i < count($objs); $i++, $row_index++): 
                 $obj = $objs[$i];
+                
                 $pro = new bll_fitinfos($obj->fitinfo_id);
                 $location = new bll_locations($pro->location_id);
                 ?>
@@ -83,7 +84,7 @@ echo JText::_('COM_FITTIZEN_TOTAL').":".$total;
                     <?php echo $location->address; ?>
                 </td>
                 <td>
-                    <?php echo 1 ?>
+                    <?php echo $obj->get_rating(); ?>
                 </td>
                 <td>
                     <form action="./index.php?option=com_fittizen&view=trainers&layout=edit" method="POST">
