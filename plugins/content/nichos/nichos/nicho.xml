@@ -10,13 +10,7 @@
                             description="PLG_CONTENT_NICHOS_FIELD_NICHOS_DESC"
                             label="PLG_CONTENT_NICHOS_FIELD_NICHOS_LABEL"
                             message="PLG_CONTENT_NICHOS_FIELD_NICHOS_MESSAGE"
-                            size="30"
-                    />
-                    <field
-                            name="nichos_id"
-                            type="hidden"
-                            id="nichos_id"
-                            value=""
+                            size="60"
                     />
             </fieldset>
     </fields>

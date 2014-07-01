@@ -50,6 +50,30 @@ class plgContentNichos extends JPlugin
 	{
 		parent::__construct($subject, $config);
 	}
+        
+        /**
+         * Find a nicho in the database
+         * @param string $needle string with the needle to find
+         * 
+         * @return fittizen_nichos_lang  dbobject or false on failure.
+         */
+        public static function find_nicho($needle)
+        {
+            $nicho = new fittizen_nichos_lang(-1);
+            $lang_id = AuxTools::GetCurrentLanguageIDJoomla();
+            $field=array(
+                            array('name', '='),
+                            array('lang_id', '=')
+                        );
+            $value=array(
+                        array($needle, null),
+                        array($lang_id, 'AND')
+                    );
+            return $nicho->find(
+                        $field, 
+                        $value
+                        );
+        }
 
 	/**
 	 * Example after save content method
@@ -64,11 +88,37 @@ class plgContentNichos extends JPlugin
 	public function onContentAfterSave($context, $article, $isNew)
 	{
 		$articleId	= $article->id;
-		if ($articleId && isset($article->rating) && (count($article->rating)))
+                $input = JFactory::getApplication()->input->getArray();
+                $nicho=array();
+                if(isset($input['jform']))
+                {
+                    if(isset($input['jform']['nicho']))
+                    {
+                        $nichos=$input['jform']['nicho']['nichos'];
+                        $nichos_arr=explode(',', $nichos);
+                        if($nichos_arr !== false)
+                        {
+                            foreach($nichos_arr as $nicho_str)
+                            {
+                                $tmp_nicho=self::find_nicho($nicho_str);
+                                if($tmp_nicho->id > 0)
+                                {
+                                    $nicho[]= $tmp_nicho;
+                                }
+                            }
+                        }
+                    }
+                }
+                 
+		if ($articleId && count($nicho) > 0)
 		{
 			try
 			{
-				$db = JFactory::getDbo();
+                            bll_nichos::remove_nichos_content($articleId);
+                            foreach($nicho as $obj_nicho)
+                            {
+                                bll_nichos::add_nicho_content($articleId, $obj_nicho->nicho_id);
+                            }
 			}
 			catch (Exception $e)
 			{
@@ -97,8 +147,7 @@ class plgContentNichos extends JPlugin
 		{
 			try
 			{
-				$db = JFactory::getDbo();
-				
+                            bll_nichos::remove_nichos_content($articleId);
 			}
 			catch (Exception $e)
 			{
@@ -169,7 +218,6 @@ class plgContentNichos extends JPlugin
 		}
 		if (is_object($data))
 		{
-                    $nichos_id ="";
                     $nichos_str="";
                     if(isset($data->id) && $data->id > 0)
                     {
@@ -180,18 +228,15 @@ class plgContentNichos extends JPlugin
                         {
                             $obj = new bll_nichos($nicho->nicho_id);
                             $lval = $obj->getLanguageValue($lang_id);
-                            $nichos_id.="$lval->nicho_id,";
                             $nichos_str.="$lval->name,";
                         }
-                        $data->nicho=array('nichos'=>$nichos_str,
-                        'nichos_id'=>$nichos_id);
+                        $data->nicho=array('nichos'=>$nichos_str);
                         return true;
                     }
                     else
                     {
                         //is new article
-                        $data->nicho=array('nichos'=>$nichos_str,
-                        'nichos_id'=>$nichos_id);
+                        $data->nicho=array('nichos'=>$nichos_str);
                         return true;
                     }
                 }

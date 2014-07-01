@@ -85,6 +85,47 @@ class FittizenController extends JControllerLegacy
             exit;
         }
         
+        public function find_nichos()
+        {
+            $needle = filter_input(INPUT_GET, 'needle');
+            $exclude = filter_input(INPUT_GET, 'exclude');
+            $lang_id=  AuxTools::GetCurrentLanguageIDJoomla();
+            $objs=array();
+            if($needle != "")
+            {
+                $bl = new fittizen_nichos_lang(-1);
+                $field=array(
+                            array('name', 'like'),
+                            array('lang_id', '=')
+                        );
+                $value=array(
+                            array($needle, null),
+                            array($lang_id, 'AND')
+                        );
+                $exclude_arr = explode(',', $exclude);
+                if($exclude_arr != false)
+                {
+                    foreach($exclude_arr as $excluded)
+                    {
+                        $name=trim($excluded);
+                        if($name != $needle)
+                        {
+                            $field[]=array('name', '<>');
+                            $value[]=array($name, 'AND');
+                        }
+                    }
+                }
+                $objs=$bl->findAll(
+                        $field, 
+                        $value
+                        );
+            }
+            ob_clean();
+            header('Content-type: application/json');
+            echo json_encode($objs);
+            exit;
+        }
+        
         public function validate_profile_code()
         {
             $needle = filter_input(INPUT_GET, 'code');
