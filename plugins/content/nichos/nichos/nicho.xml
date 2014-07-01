@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <fields name="nicho">
+            <fieldset name="nichos_name" 
+                      label="PLG_CONTENT_NICHOS_SLIDER_LABEL">
+                    <field
+                            name="nichos"
+                            type="text"
+                            id="nichos"
+                            description="PLG_CONTENT_NICHOS_FIELD_NICHOS_DESC"
+                            label="PLG_CONTENT_NICHOS_FIELD_NICHOS_LABEL"
+                            message="PLG_CONTENT_NICHOS_FIELD_NICHOS_MESSAGE"
+                            size="30"
+                    />
+                    <field
+                            name="nichos_id"
+                            type="hidden"
+                            id="nichos_id"
+                            value=""
+                    />
+            </fieldset>
+    </fields>
+</form>

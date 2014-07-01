@@ -1,5 +1,5 @@
 <?php
-
+header ('Content-type: text/html; charset=utf-8');
 use Dompdf\Adapter\CPDF;
 use Dompdf\Dompdf;
 
@@ -18,7 +18,7 @@ if ( isset( $_POST["html"] ) && $is_local ) {
   $dompdf->load_html($_POST["html"]);
   $dompdf->set_paper($_POST["paper"], $_POST["orientation"]);
   $dompdf->render();
-
+  
   $dompdf->stream("dompdf_out.pdf", array("Attachment" => true));
 
   exit(0);

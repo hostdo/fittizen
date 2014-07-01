@@ -1,0 +1,15 @@
+div.nichos {
+    display: block;
+    float: left;
+    padding-right: 10px;
+}
+div.nichos table tr td {
+    margin: 1px !important;
+    padding: 2px !important;
+}
+div.nichos table tr.row0  {
+	background-color:#efefef;
+}
+div.nichos table tr.row1 {
+	background-color:#ffffff;
+}

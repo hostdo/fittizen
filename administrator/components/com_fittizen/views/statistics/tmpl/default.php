@@ -48,6 +48,7 @@ else {
     $total = count($all);
 }
 
+
 if(filter_has_var(INPUT_POST, 'date'))
 {
     $date = filter_input(INPUT_POST, 'date');
@@ -97,6 +98,63 @@ if(filter_has_var(INPUT_POST, 'gym_id'))
 {
     $gym_id = filter_input(INPUT_POST, 'gym_id');
 }
+
+$report_html="
+<h3>".JText::_('COM_FITTIZEN_USER_REPORT')."</h3>
+<table class=\"table table-striped\" border=\"1\">
+        <thead>
+            <tr>
+                <th>
+                    
+                    ". JText::_('COM_FITTIZEN_ID')."
+                    
+                </th>
+                <th>
+                    ". JText::_('COM_FITTIZEN_NAME')."
+                    
+                </th>
+                <th>
+                    ". JText::_('COM_FITTIZEN_LOCATION')."
+                    
+                </th>";
+
+if($type == "2"):
+                $report_html.="<th>
+                    ". JText::_('COM_FITTIZEN_RATING')
+                    ."
+                </th>";
+endif;
+                
+$report_html.="</tr>
+        </thead>
+        <tbody>";
+           for($i=0, $row_index=1; $i < count($objs); $i++, $row_index++): 
+                $obj = $objs[$i];
+                $pro = new bll_fitinfos($obj->fitinfo_id);
+                $location = new bll_locations($pro->location_id);
+                $report_html.="
+            <tr class=\"row".($row_index%2)." \">
+                <td>
+                    ". $pro->id."
+                </td>
+                <td>
+                    ".  htmlentities($pro->name." ".$pro->last_name, ENT_SUBSTITUTE)."
+                </td>
+                <td>
+                    ". htmlentities($location->address, ENT_SUBSTITUTE)."
+                </td>";
+                if($type == "2"): 
+                    $report_html.="<td>
+                        ".$obj->get_rating()."
+                    </td>";
+                endif;
+                $report_html.="
+            </tr>";
+            endfor;
+            
+        $report_html.="</tbody>
+    </table>";
+
 $nicho = new fittizen_nichos_lang(-1);
 $nichos = $nicho->findAll('lang_id', $language->lang_id);
 $nichos = dbobject::convertListToHash($nichos,'nicho_id', 'name', $nicho_id,true);
@@ -300,7 +358,7 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
       $form->setLayout(FormLayouts::FORMS_UL_LAYOUT);
       $form->Hidden('user', 1);
       $form->Hidden('paper', 'tabloid');
-      $form->Hidden('html', $report_html);
+      $form->Hidden('html', htmlentities($report_html, ENT_COMPAT));
       $form->Hidden('orientation', 'portrait');
       $form->Label(JText::_('COM_FITTIZEN_GENDER'), 'gender_id');
       $form->SelectBox('gender_id', $genders);
@@ -378,7 +436,7 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
                 ?>
             <tr class="row<?php echo ($row_index%2) ?>">
                 <td>
-                    <?php echo $obj->id; ?>
+                    <?php echo $pro->id; ?>
                 </td>
                 <td>
                     <?php echo $pro->name." ".$pro->last_name; ?>
