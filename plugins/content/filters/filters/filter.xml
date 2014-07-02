@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<form>
+    <fields name="nicho">
+            <fieldset name="filters_name" 
+                      label="PLG_CONTENT_FILTERS_SLIDER_LABEL">
+                    <field
+                            name="filters"
+                            type="text"
+                            id="filters"
+                            description="PLG_CONTENT_FILTERS_FIELD_FILTERS_DESC"
+                            label="PLG_CONTENT_FILTERS_FIELD_FILTERS_LABEL"
+                            message="PLG_CONTENT_FILTERS_FIELD_FILTERS_MESSAGE"
+                            size="60"
+                    />
+            </fieldset>
+    </fields>
+</form>-->

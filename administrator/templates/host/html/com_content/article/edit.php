@@ -11,7 +11,11 @@ defined('_JEXEC') or die;
 
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-
+$lang = JFactory::getLanguage();
+$extension = 'com_fittizen';
+$language_tag = AuxTools::GetCurrentLanguageJoomla();
+$reload = true;
+$lang->load($extension, JPATH_COMPONENT_ADMINISTRATOR, $language_tag, $reload);
 JHtml::_('behavior.formvalidation');
 JHtml::_('behavior.keepalive');
 JHtml::_('formbehavior.chosen', 'select');
@@ -20,12 +24,15 @@ $this->hiddenFieldsets = array();
 $this->hiddenFieldsets[0] = 'basic-limited';
 $this->configFieldsets = array();
 $this->configFieldsets[0] = 'editorConfig';
-
 // Create shortcut to parameters.
 $params = $this->state->get('params');
-
 $app = JFactory::getApplication();
 $input = $app->input;
+$fdata=$this->form->getData()->toArray();
+if(isset($fdata['nicho']))
+{
+    $json_nicho=$fdata['nicho']['nichos'];
+}
 $assoc = JLanguageAssociations::isEnabled();
 
 // This checks if the config options have ever been saved. If they haven't they will fall back to the original settings.
@@ -73,70 +80,24 @@ if (isset($this->item->attribs['show_urls_images_backend']) && $this->item->attr
 		}
 	};
 </script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . TINY_INPUT_JS; ?>"></script>
+<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . TINY_INPUT_CSS; ?>" />
 
 <script type="text/javascript">
-
-jQuery(function() {
-    function split( val )
-    {
-      return val.split( /,\s*/ );
-    }
-    function extractLast( term ) 
-    {
-      return split( term ).pop();
-    }
- 
-    jQuery( "#jform_nicho_nichos" )
-      // don't navigate away from the field on tab when selecting an item
-      .bind( "keydown", function( event ) {
-        if ( event.keyCode === jQuery.ui.keyCode.TAB &&
-            jQuery( this ).autocomplete( "instance" ).menu.active ) {
-          event.preventDefault();
-        }
-      })
-      .autocomplete({
-        source: function( request, response ) {
-          jQuery.getJSON( "<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_nichos&format=json", {
-            needle: extractLast( request.term ),
-            exclude: jQuery("#jform_nicho_nichos").val()
-          }).done(function(data)
-          {
-           response( jQuery.map( data, function( item ) 
-              {
-                return {
-                  label: item.name,
-                  value: item.nicho_id
-                }
-              })
-                   )   
-          });
-        },
-        search: function() {
-          // custom minLength
-          var term = extractLast( this.value );
-          if ( term.length < 2 ) {
-            return false;
-          }
-        },
-        focus: function() {
-          // prevent value inserted on focus
-          return false;
-        },
-        select: function( event, ui ) {
-          var terms = split( this.value );
-          // remove the current input
-          terms.pop();
-          // add the selected item
-          terms.push( ui.item.label );
-          // add placeholder to get the comma-and-space at the end
-          terms.push( "" );
-          this.value = terms.join( ", " );
-          return false;
-        }
-      });
-  });
+jQuery(document).ready(function() {
+    
+    jQuery( "#jform_nicho_nichos" ).tokenInput(
+         "<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_nichos&format=json",
+         {
+         preventDuplicates: true, queryParam:"needle", 
+         prePopulate:<?php echo ($json_nicho); ?>, theme: "mac",
+         hintText:"<?php echo JText::_('COM_FITTIZEN_AUTO_COMPLETE_HINT_TEXT') ?>",
+         noResultsText:"<?php echo JText::_('COM_FITTIZEN_AUTO_COMPLETE_NO_RESULTS_TEXT') ?>",
+         searchingText:"<?php echo JText::_('COM_FITTIZEN_AUTO_COMPLETE_SEARCHING_TEXT') ?>"
+         }
+    );
+     
+});
 </script>
 
 <form action="<?php echo JRoute::_('index.php?option=com_content&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="item-form" class="form-validate">

@@ -1,12 +1,6 @@
 <?php
-
-
-
 if (!defined('BASE_DIR'))
-
     define('BASE_DIR', dirname(dirname(__FILE__)));
-
-
 
 define('INCLUDES', 'includes.php');
 
@@ -71,6 +65,8 @@ define('SLIDES_JQUERY', 'slides.jquery.js');
 define('JQUERY', 'jquery-1.10.2.js');
 define('DATE_TIME_JS', 'datetime/jquery.datetimepicker.js');
 define('DATE_TIME_CSS', 'datetime/jquery.datetimepicker.css');
+define('TINY_INPUT_JS', 'tokeninput/jquery.tokeninput.js');
+define('TINY_INPUT_CSS', 'tokeninput/token-input-mac.css');
 
 //CONFIG FILE NAME HERE
 define('CONFIG_FILE', 'config.php');

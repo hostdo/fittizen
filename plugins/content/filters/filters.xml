@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.3" type="plugin" group="content" method="upgrade">
+	<name>plg_content_filters</name>
+	<author>Elias Gonzalez</author>
+	<creationDate>July 2014</creationDate>
+	<copyright>(C) 2005 - 2015 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see	LICENSE.txt</license>
+	<authorEmail>elias@host.do</authorEmail>
+	<authorUrl>host.do</authorUrl>
+	<version>1.0</version>
+	<description>PLG_CONTENT_FILTERS_XML_DESCRIPTION</description>
+
+	<files>
+		<folder>language</folder>
+		<folder>filters</folder>
+		<filename plugin="filters">filters.php</filename>
+		<filename>index.html</filename>
+	</files>
+
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+			</fieldset>
+		</fields>
+	</config>
+
+</extension>

@@ -1,8 +1,8 @@
 <?php
 /**
  * @package		Joomla.Site
- * @subpackage	plg_content_nichos
- * @copyright	Copyright (C) 2005 - 2014 Open Source Matters, Inc. All rights reserved.
+ * @subpackage	plg_content_rating
+ * @copyright	Copyright (C) 2005 - 2012 Open Source Matters, Inc. All rights reserved.
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -26,7 +26,7 @@ oDirectory::loadClassesFromDirectory($jpathadm.DS.MODELS.DS.LOGIC);
  * 
  * @version		1.6
  */
-class plgContentNichos extends JPlugin
+class plgContentFilters extends JPlugin
 {
     
         /**
@@ -50,30 +50,6 @@ class plgContentNichos extends JPlugin
 	{
 		parent::__construct($subject, $config);
 	}
-        
-        /**
-         * Find a nicho in the database
-         * @param string $needle string with the needle to find
-         * 
-         * @return fittizen_nichos_lang  dbobject or false on failure.
-         */
-        public static function find_nicho($needle)
-        {
-            $nicho = new fittizen_nichos_lang(-1);
-            $lang_id = AuxTools::GetCurrentLanguageIDJoomla();
-            $field=array(
-                            array('name', '='),
-                            array('lang_id', '=')
-                        );
-            $value=array(
-                        array($needle, null),
-                        array($lang_id, 'AND')
-                    );
-            return $nicho->find(
-                        $field, 
-                        $value
-                        );
-        }
 
 	/**
 	 * Example after save content method
@@ -145,15 +121,17 @@ class plgContentNichos extends JPlugin
 		$articleId	= $article->id;
 		if ($articleId)
 		{
-			try
-			{
-                            bll_nichos::remove_nichos_content($articleId);
-			}
-			catch (Exception $e)
-			{
-				$this->_subject->setError($e->getMessage());
-				return false;
-			}
+                    try
+                    {
+                        bll_ads::remove_nichos_banner($articleId);
+                        bll_ads::remove_locations_banner($articleId);
+                        bll_ads::remove_filters_banner($articleId);
+                    }
+                    catch (Exception $e)
+                    {
+                            $this->_subject->setError($e->getMessage());
+                            return false;
+                    }
 		}
 
 		return true;
@@ -178,21 +156,10 @@ class plgContentNichos extends JPlugin
             }
             // Check we are manipulating a valid form.
             $name = $form->getName();
-            if (!in_array($name, array('com_content.article')))
+            if (!in_array($name, array('com_banners.banner')))
             {
                     return true;
             }
-            // Add the registration fields to the form.
-            JForm::addFormPath(__DIR__ . '/nichos');
-            if(!$form->loadFile('nicho', false))
-            {
-                echo "non-load";
-            }
-
-            $fields = array(
-                    'nichos'
-            );
-            $form->setFieldAttribute('nichos', 'description', 'PLG_CONTENT_NICHOS_FIELD_NICHOS_DESC', 'nichos');
             
             return true;
         }
@@ -210,32 +177,42 @@ class plgContentNichos extends JPlugin
 	public function onContentPrepareData($context, $data)
 	{
 		// Check we are manipulating a valid form.
-		if (!in_array($context, array('com_content.article')))
+		if (!in_array($context, array('com_banners.banner')))
 		{
                     return true;
 		}
 		if (is_object($data))
 		{
+                    $input = JFactory::getApplication()->input;
                     $nichos_arr=array();
+                    $location_arr=array();
+                    $filter = new fittizen_banner_filter(-1);
+                    $age_rate = "5 , 90";
                     if(isset($data->id) && $data->id > 0)
                     {
-                        $nichos=bll_nichos::get_nichos_content($data->id);
+                        $nichos=bll_ads::get_nichos_banner($data->id);
+                        $locations = bll_ads::get_locations_banner($data->id);
+                        $filter=bll_ads::get_filters_banner($data->id);
                         $lang_id = AuxTools::GetCurrentLanguageIDJoomla();
+                        $gender = new fittizen_gender_lang(-1);
+                        $genders = $gender->findAll('lang_id', $lang_id);
                         foreach($nichos as $nicho)
                         {
                             $obj = new bll_nichos($nicho->nicho_id);
                             $lval = $obj->getLanguageValue($lang_id);
                             $nichos_arr[]=$lval;
                         }
-                        $data->nicho=array('nichos'=>json_encode($nichos_arr));
-                        return true;
+                        foreach($locations as $location)
+                        {
+                            $obj = new bll_locations($location->location_id);
+                            $location_arr[]=$obj;
+                        }
                     }
-                    else
-                    {
-                        //is new article
-                        $data->nicho=array('nichos'=>json_encode($nichos_arr));
-                        return true;
-                    }
+                    $input->set('nicho', json_encode($nichos_arr));
+                    $input->set('location', json_encode($location_arr));
+                    $input->set('filter', json_encode($filter));
+                    $input->set('gender', json_encode($genders));
+                    return true;
                 }
                 return false;
         }

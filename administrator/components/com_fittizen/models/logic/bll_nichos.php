@@ -288,5 +288,29 @@ class bll_nichos extends fittizen_nichos
        $obj = new fittizen_content_nichos(-1);
        return $obj->delete('content_id', $cid);
    }
+   
+   /**
+     * Find a nicho in the database
+     * @param string $needle string with the needle to find
+     * 
+     * @return fittizen_nichos_lang  dbobject or false on failure.
+     */
+    public static function find_nicho($needle)
+    {
+        $nicho = new fittizen_nichos_lang(-1);
+        $lang_id = AuxTools::GetCurrentLanguageIDJoomla();
+        $field=array(
+                        array('name', '='),
+                        array('lang_id', '=')
+                    );
+        $value=array(
+                    array($needle, null),
+                    array($lang_id, 'AND')
+                );
+        return $nicho->find(
+                    $field, 
+                    $value
+                    );
+    }
 }
 
