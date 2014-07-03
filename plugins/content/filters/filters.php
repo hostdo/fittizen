@@ -17,6 +17,11 @@ require_once JPATH_ROOT.DS.LIBS.INCLUDES;
 $jpathadm = JPATH_ADMINISTRATOR.DS.COMPONENTS."com_fittizen";
 oDirectory::loadClassesFromDirectory($jpathadm.DS.MODELS.DS.DATA);
 oDirectory::loadClassesFromDirectory($jpathadm.DS.MODELS.DS.LOGIC);
+$lang = JFactory::getLanguage();
+$extension = 'com_fittizen';
+$language_tag = AuxTools::GetCurrentLanguageJoomla();
+$reload = true;
+$lang->load($extension, $jpathadm, $language_tag, $reload);
 
 
 /**
@@ -65,36 +70,73 @@ class plgContentFilters extends JPlugin
 	{
 		$articleId	= $article->id;
                 $input = JFactory::getApplication()->input->getArray();
+                
                 $nicho=array();
-                if(isset($input['jform']))
+                $location=array();
+                if(isset($input['nichos']))
                 {
-                    if(isset($input['jform']['nicho']))
+                    $nichos=$input['nichos'];
+                    $nichos_arr=explode(',', $nichos);
+                    if($nichos_arr !== false)
                     {
-                        $nichos=$input['jform']['nicho']['nichos'];
-                        $nichos_arr=explode(',', $nichos);
-                        if($nichos_arr !== false)
+                        foreach($nichos_arr as $nicho_str)
                         {
-                            foreach($nichos_arr as $nicho_str)
+                            $tmp_nicho=new fittizen_nichos_lang($nicho_str);
+                            if($tmp_nicho->id > 0)
                             {
-                                $tmp_nicho=new fittizen_nichos_lang($nicho_str);
-                                if($tmp_nicho->id > 0)
-                                {
-                                    $nicho[]= $tmp_nicho;
-                                }
+                                $nicho[]= $tmp_nicho;
                             }
                         }
                     }
                 }
-                 
+                if(isset($input['location']))
+                {
+                    $locations=$input['location'];
+                    $locations_arr=explode(',', $locations);
+                    if($locations_arr !== false)
+                    {
+                        foreach($locations_arr as $location_str)
+                        {
+                            $tmp_l=new bll_locations($location_str);
+                            if($tmp_l->id > 0)
+                            {
+                                $location[]= $tmp_l;
+                            }
+                        }
+                    }
+                }
+                $min_age="";
+                $max_age="";
+                $gender="";
+                if(isset($input['gender']))
+                {
+                    $gender=$input['gender'];
+                }
+                if(isset($input['max_age']))
+                {
+                    $max_age = $input['max_age'];
+                }
+                if(isset($input['min_age']))
+                {
+                    $min_age = $input['min_age'];
+                }
 		if ($articleId && count($nicho) > 0)
 		{
 			try
 			{
-                            bll_nichos::remove_nichos_content($articleId);
+                            bll_ads::remove_nichos_banner($articleId);
                             foreach($nicho as $obj_nicho)
                             {
-                                bll_nichos::add_nicho_content($articleId, $obj_nicho->nicho_id);
+                                bll_ads::add_nicho_banner($articleId, $obj_nicho->nicho_id);
                             }
+                            bll_ads::remove_locations_banner($articleId);
+                            foreach($location as $obj_lo)
+                            {
+                                bll_ads::add_location_banner($articleId, $obj_lo->id);
+                            }
+                            bll_ads::remove_filters_banner($articleId);
+                            bll_ads::add_filter_banner($articleId, $gender, $max_age, $min_age);
+                            
 			}
 			catch (Exception $e)
 			{

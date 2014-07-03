@@ -17,6 +17,11 @@ require_once JPATH_ROOT.DS.LIBS.INCLUDES;
 $jpathadm = JPATH_ADMINISTRATOR.DS.COMPONENTS."com_fittizen";
 oDirectory::loadClassesFromDirectory($jpathadm.DS.MODELS.DS.DATA);
 oDirectory::loadClassesFromDirectory($jpathadm.DS.MODELS.DS.LOGIC);
+$lang = JFactory::getLanguage();
+$extension = 'com_fittizen';
+$language_tag = AuxTools::GetCurrentLanguageJoomla();
+$reload = true;
+$lang->load($extension, $jpathadm, $language_tag, $reload);
 
 
 /**

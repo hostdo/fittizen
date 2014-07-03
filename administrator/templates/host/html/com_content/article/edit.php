@@ -11,11 +11,7 @@ defined('_JEXEC') or die;
 
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
-$lang = JFactory::getLanguage();
-$extension = 'com_fittizen';
-$language_tag = AuxTools::GetCurrentLanguageJoomla();
-$reload = true;
-$lang->load($extension, JPATH_COMPONENT_ADMINISTRATOR, $language_tag, $reload);
+
 JHtml::_('behavior.formvalidation');
 JHtml::_('behavior.keepalive');
 JHtml::_('formbehavior.chosen', 'select');

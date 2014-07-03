@@ -247,6 +247,17 @@ $types = $ntypes;
           }
         });
         
+     $("#type").change(function(){
+            if(this.value == 2)
+            {
+                $( "#slider-range" ).slider({ disabled: false });
+            }
+            else
+            {
+                $( "#slider-range" ).slider({ disabled: true });
+            }
+     });
+        
         $( "#country" ).autocomplete({
           source: function( request, response ) {
             $.ajax({
@@ -381,7 +392,7 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
       $form->Date('birth_date', $birth_date, 'birth_date');
       
       $form->Label(JText::_('COM_FITTIZEN_TYPE'), 'type');
-      $form->SelectBox('type', $types);
+      $form->SelectBox('type', $types, 'type');
       
       $form->Label(JText::_('COM_FITTIZEN_SYNCED_WITH'), 'facebook');
       $form->SelectBox('facebook', $facebooks);

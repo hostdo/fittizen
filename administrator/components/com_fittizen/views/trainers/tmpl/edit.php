@@ -117,7 +117,7 @@ $(function(){
         $form->Text('location', $location->address, 'location', '', false);
         $form->Label(JText::_('COM_FITTIZEN_HEIGHT').'('.bll_measures::$m.')', 'height');
         $form->Text('height', $pro->height, '', '', false);  
-        $form->Label(JText::_('COM_FITTIZEN_WEIGHT'.'('.bll_measures::$kg.')'), 'weight');
+        $form->Label(JText::_('COM_FITTIZEN_WEIGHT').'('.bll_measures::$kg.')', 'weight');
         $form->Text('weight', $pro->weight, '', '', false);      
         $form->Label(JText::_('COM_FITTIZEN_HIP').'('.bll_measures::$cm.')', 'hip');
         $form->Text('hip', $pro->hip, '', '', false);    

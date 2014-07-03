@@ -172,7 +172,7 @@ class bll_ads
     */
    public static function remove_filters_banner($bid)
    {
-       $obj = new fittizen_banner_filters(-1);
+       $obj = new fittizen_banner_filter(-1);
        return $obj->delete('banner_id', $bid);
    }
    

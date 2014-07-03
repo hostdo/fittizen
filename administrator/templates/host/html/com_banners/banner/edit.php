@@ -8,18 +8,15 @@
  */
 
 defined('_JEXEC') or die;
-$lang = JFactory::getLanguage();
-$extension = 'com_fittizen';
-$language_tag = AuxTools::GetCurrentLanguageJoomla();
-$reload = true;
-$lang->load($extension, JPATH_COMPONENT_ADMINISTRATOR, $language_tag, $reload);
+
 JHtml::addIncludePath(JPATH_COMPONENT . '/helpers/html');
 JHtml::_('behavior.formvalidation');
 JHtml::_('formbehavior.chosen', 'select');
 $jspath = AuxTools::getJSPathFromPHPDir(BASE_DIR);
 $fdata=$this->form->getData()->toArray();
 $input = JFactory::getApplication()->input->getArray();
-$age_rate="5 , 90";
+$min_age="";
+$max_age="";
 $gender_id =0;
 if(isset($input['nicho']))
 {
@@ -32,9 +29,13 @@ if(isset($input['location']))
 if(isset($input['filter']))
 {
     $filter= json_decode($input['filter']);
-    if($filter->min_age != "" && $filter->max_age != "")
+    if($filter->min_age != "")
     {
-        $age_rate="$filter->min_age , $filter->max_age";
+        $min_age=$filter->min_age;
+    }
+    if($filter->max_age != "")
+    {
+        $max_age=$filter->max_age;
     }
     $gender_id = $filter->gender_id;
 }
@@ -71,6 +72,32 @@ JFactory::getDocument()->addScriptDeclaration($script);
 <script type="text/javascript" src="<?php echo $jspath . LIBS . JS . TINY_INPUT_JS; ?>"></script>
 <link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . TINY_INPUT_CSS; ?>" />
 <script type="text/javascript">
+
+
+function _validate_age()
+{
+    var val_min = document.getElementById('jform_min_age').value;
+    var val_max = document.getElementById('jform_max_age').value;
+    var bool = (val_min > val_max);
+    if(bool)
+    {
+        val_min = val_max-1;
+        if(val_min <= 0)
+            val_min = 1;
+        
+        jQuery("#jform_min_age").val(val_min);
+        jQuery("#jform_max_age").val(val_max);
+        setScreenAge(jQuery("#jform_max_age")[0]);
+        setScreenAge(jQuery("#jform_min_age")[0]);
+    }
+}
+
+function setScreenAge(context)
+{
+    var elem = context.nextSibling.firstChild.firstChild;
+    elem.innerHTML = context.value;
+}
+
 jQuery(document).ready(function() {
     
     jQuery( "#jform_nicho_nichos" ).tokenInput(
@@ -136,7 +163,7 @@ jQuery(document).ready(function() {
 
                         </div>
                         <div class="controls">
-                            <input type="text" autocomplete="off" id="jform_nicho_nichos">    
+                            <input type="text" name="nichos" autocomplete="off" id="jform_nicho_nichos">    
                         </div>
                     </div>
                     <!-- Location -->
@@ -150,7 +177,7 @@ jQuery(document).ready(function() {
 
                         </div>
                         <div class="controls">
-                            <input type="text" autocomplete="off" id="jform_location">    
+                            <input type="text" name="location" autocomplete="off" id="jform_location">    
                         </div>
                     </div>
                     <!-- Age Range -->
@@ -164,8 +191,38 @@ jQuery(document).ready(function() {
 
                         </div>
                         <div class="controls">
-                            <p>
-                                <input name="jform_age" type="text" id="jform_age" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                              <p>
+                                  <select name="min_age" id="jform_min_age" onchange="return _validate_age();">
+                                      <?php 
+                                      $opt_html="";
+                                      for($i=1; $i <= 100; $i++)
+                                      {
+                                            $sel = "";
+                                            if($min_age == $i)
+                                            {
+                                                $sel = "selected";
+                                            }
+                                            $opt_html.= "<option value=\"$i\" $sel >$i</option>";
+                                      }
+                                      echo $opt_html;
+                                      ?>
+                                  </select>
+                                  -
+                                  <select name="max_age" id="jform_max_age" onchange="return _validate_age();">
+                                      <?php 
+                                      $opt_html="";
+                                      for($i=1; $i <= 100; $i++)
+                                      {
+                                            $sel = "";
+                                            if($max_age == $i)
+                                            {
+                                                $sel = "selected";
+                                            }
+                                            $opt_html.= "<option value=\"$i\" $sel >$i</option>";
+                                      }
+                                      echo $opt_html;
+                                      ?>
+                                  </select>
                               </p>
                         </div>
                     </div>
@@ -179,7 +236,7 @@ jQuery(document).ready(function() {
                             </label>
                         </div>
                         <div class="controls">
-                            <select name="jform_gender">
+                            <select name="gender">
                                 <option value=""></option>
                                 <?php
                                 $opt_html = "";

@@ -56,9 +56,8 @@
                         <folder>language</folder>
 		</files>
                 <languages folder="admin">
-                        <language tag="en-GB">language/en-GB/en-GB.com_catalog.ini</language>
-                        <language tag="en-US">language/en-US/en-US.com_catalog.ini</language>
-                        <language tag="es-ES">language/es-ES/es-ES.com_catalog.ini</language>
+                        <language tag="en-GB">language/en-GB/en-GB.com_fittizen.ini</language>
+                        <language tag="es-ES">language/es-ES/es-ES.com_fittizen.ini</language>
                 </languages>
 	</administration>
 
