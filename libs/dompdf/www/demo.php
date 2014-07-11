@@ -7,7 +7,8 @@ require_once("../dompdf_config.inc.php");
 
 // We check wether the user is accessing the demo locally
 $local = array("::1", "127.0.0.1");
-$is_local = in_array($_SERVER['REMOTE_ADDR'], $local);
+$is_local=true;
+//$is_local = in_array($_SERVER['REMOTE_ADDR'], $local);
 
 if ( isset( $_POST["html"] ) && $is_local ) {
 
