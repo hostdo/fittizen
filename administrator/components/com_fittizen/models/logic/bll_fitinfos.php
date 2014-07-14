@@ -1295,6 +1295,19 @@ class bll_fitinfos extends fittizen_fitinfos
     }
     
     /**
+     * Gets a profile
+     * 
+     * @param integer $id user id of the profile to view.
+     * 
+     * @return bll_fitinfos profile
+     */
+    public static function getProfileByUserId($id)
+    {
+        $obj = new bll_fitinfos(-1);
+        return $obj->find('user_id', $id);
+    }
+    
+    /**
      * Perform a comment
      * 
      * @param string $type name of the type of comment
