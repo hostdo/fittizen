@@ -30,7 +30,7 @@ $document = JFactory::getDocument();
 
 // Get an instance of the controller prefixed by Fittizen
 $controller = JControllerLegacy::getInstance('Fittizen');
-
+JLoader::register('FittizenHelper', JPATH_COMPONENT.DS.'helpers'.DS.'fittizen.php', true);
 // Perform the Request task
 $controller->execute(JRequest::getCmd('task'));
 

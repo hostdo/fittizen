@@ -14,6 +14,8 @@ defined('_JEXEC') or die('Restricted access');
 
 $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
+$session = JFactory::getSession();
+$social_logout=(bool)$session->get('social_logout', false);
 ?>
 
 <script>
@@ -40,6 +42,17 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
     }
   }
 
+  <?php 
+  if($social_logout){
+  ?>
+      
+    FB.logout(function(response) {
+        // Person is now logged out in facebook
+    });
+  <?php 
+  }
+  ?>
+
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
@@ -51,7 +64,7 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
   window.fbAsyncInit = function() {
   FB.init({
-    appId      : '1442208259376401',
+    appId      : '<?php echo FB_API_ID; ?>',
     cookie     : true,  // enable cookies to allow the server to access 
                         // the session
     xfbml      : true,  // parse social plugins on this page
@@ -93,6 +106,7 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
       var form_html = '<input type="hidden" name="option" value="com_fittizen" /><input type="hidden" name="task" value="facebook_login" />';
+      form_html+= '<input type="hidden" name="user_creation_fail_redirect" value="" />';
       form_html+= '<input type="hidden" name="params" value="'+jQuery.param(response)+'" />'; 
       jQuery("#social-login").html(form_html);
       jQuery("#social-login").submit();
@@ -108,6 +122,16 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
 <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
 </fb:login-button>
+<span id="signinButton">
+  <span
+    class="g-signin"
+    data-callback="signinCallback"
+    data-clientid="<?php echo GPLUS_CLIENT_ID; ?>"
+    data-cookiepolicy="<?php echo GPLUS_COOKIE_POLICY; ?>"
+    data-requestvisibleactions="http://schemas.google.com/AddActivity"
+    data-scope="https://www.googleapis.com/auth/plus.login">
+  </span>
+</span>
 <div id="status">
 </div>
 
@@ -118,4 +142,32 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
 <div id="block">
 </div>
+
+<!-- Coloca este JavaScript asíncrono justo delante de la etiqueta </body> -->
+<script type="text/javascript">
+    function signinCallback(authResult) {
+    if (authResult['access_token']) {
+      // Autorizado correctamente
+      // Oculta el botón de inicio de sesión ahora que el usuario está autorizado, por ejemplo:
+      document.getElementById('signinButton').setAttribute('style', 'display: none');
+      var form_html = '<input type="hidden" name="option" value="com_fittizen" /><input type="hidden" name="task" value="facebook_login" />';
+      form_html+= '<input type="hidden" name="params" value="'+jQuery.param(authResult)+'" />'; 
+      jQuery("#social-login").html(form_html);
+      jQuery("#social-login").submit();
+    } 
+    else if (authResult['error']) {
+      // Se ha producido un error.
+      // Posibles códigos de error:
+      //   "access_denied": el usuario ha denegado el acceso a la aplicación.
+      //   "immediate_failed": no se ha podido dar acceso al usuario de forma automática.
+        console.log('There was an error: ' + authResult['error']);
+    }
+  }  
+    
+  (function() {
+   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+   po.src = 'https://apis.google.com/js/client:plusone.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+ })();
+</script>
     

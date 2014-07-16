@@ -137,7 +137,7 @@ class bll_fitinfos extends fittizen_fitinfos
             }
             $i=0;
             $tmp=$codestr;
-            while(bll_fitinfos::check_profile_code($tmp))
+            while(!bll_fitinfos::check_profile_code($tmp))
             {
                 $i++;
                 $tmp = $codestr.'_'.$i;
@@ -1262,9 +1262,9 @@ class bll_fitinfos extends fittizen_fitinfos
     {
         $obj = new bll_fitinfos(0);
         $obj->setAttributes($attributes);
-        $this->profile_code=$obj->generate_code();
+        $obj->profile_code=$obj->generate_code();
         $obj->created_date = AuxTools::DateTimeCurrentString();
-        $obj->last_notification_check = $this->created_date;
+        $obj->last_notification_check = $obj->created_date;
         $obj=$obj->insert();
         if($obj !== false)
         {

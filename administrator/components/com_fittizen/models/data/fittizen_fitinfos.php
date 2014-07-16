@@ -19,6 +19,7 @@ class fittizen_fitinfos extends dbobject {
     public $birth_date="";
     public $weight="";
     public $height="";
+    public $phone="";
     public $neck="";
     public $chest="";
     public $hip="";

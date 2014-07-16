@@ -19,22 +19,12 @@ jimport('joomla.application.component.view');
 /**
  * HTML View class for the Component
  */
-class FittizenViewMain extends JViewLegacy
+class FittizenViewAccount extends JViewLegacy
 {
 	// Overwriting JView display method
 	function display($tpl = null) 
 	{
-            switch($this->_layout)
-            {
-                case "default":
-                    FittizenHelper::redirect_logged_in_user();
-                break;
-                default:
-                    
-                break;
-            }
-            // Display the view
-            parent::display($tpl);
+		// Display the view
+		parent::display($tpl);
 	}
-        
 }

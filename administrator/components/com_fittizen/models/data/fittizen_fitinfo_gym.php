@@ -12,6 +12,7 @@ class fittizen_fitinfo_gym extends dbobject {
     public $id="";
     public $fitinfo_id="";
     public $gym_id="";
+    public $rate="";
     public $created_date="";
     
         

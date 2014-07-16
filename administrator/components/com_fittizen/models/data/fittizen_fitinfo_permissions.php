@@ -14,6 +14,7 @@ class fittizen_fitinfo_permissions extends dbobject {
     public $public="";
     public $age="";
     public $address="";
+    public $phone="";
     public $email="";
     public $weight_history="";
     public $height_history="";

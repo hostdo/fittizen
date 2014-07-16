@@ -8,6 +8,9 @@ define('FACTORY', 'factory.php');
 define('DEFAULT_CONVERTION_RATE', 1.0);
 define('DEFAULT_CURRENCY', 'US$');
 define('NUMBER_ELEMENTS_BY_PAGE', 10);
+define('FB_API_ID', '1442208259376401');
+define('GPLUS_CLIENT_ID', '221125422497-qplu1il5sr2credrpiel4f32kd18tpbh.apps.googleusercontent.com');
+define('GPLUS_COOKIE_POLICY', 'none');
 
 define('_EXEC', 1);
 define('JS_PREFOLDER', './');

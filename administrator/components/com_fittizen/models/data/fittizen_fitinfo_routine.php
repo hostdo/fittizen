@@ -15,6 +15,8 @@ class fittizen_fitinfo_routine extends dbobject {
     public $trainer_id="";
     public $active="";
     public $created_date="";
+    public $rate="";//add to database
+    public $review="";//add to database
     
         
    /**

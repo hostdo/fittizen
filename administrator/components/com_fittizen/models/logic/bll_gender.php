@@ -223,5 +223,16 @@ class bll_gender extends fittizen_gender
                         $lower_limit, $upper_limit),
                 'fitinfo_id');
     }
+    
+    /**
+     * find the gender by its name
+     * @param string $name
+     * @return bll_gender gender found
+     */
+    public static function find_gender($name)
+    {
+        $lval = new fittizen_gender_lang(-1);
+        return new bll_gender($lval->find('name', $name)->gender_id);
+    }
 }
 

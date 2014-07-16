@@ -12,6 +12,8 @@ class fittizen_fitinfo_diet extends dbobject {
     public $id="";
     public $fitinfo_id="";
     public $diet_id="";
+    public $rate="";
+    public $review="";
     public $created_date="";
     
         
