@@ -54,8 +54,8 @@ class JConfig {
 	public $sef_suffix = '0';
 	public $unicodeslugs = '0';
 	public $feed_limit = '10';
-	public $log_path = 'C:\\wamp\\www\\fittizen_base/logs';
-	public $tmp_path = 'C:\\wamp\\www\\fittizen_base/tmp';
+	public $log_path = 'C:\\wamp\\www\\fittizen_base/trunk/logs';
+	public $tmp_path = 'C:\\wamp\\www\\fittizen_base/trunk/tmp';
 	public $lifetime = '15';
 	public $session_handler = 'database';
 }
