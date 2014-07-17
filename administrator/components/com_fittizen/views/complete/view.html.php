@@ -42,9 +42,7 @@ class FittizenViewComplete extends JViewLegacy
                 {
                     $this->objname = filter_input(INPUT_POST, 'obj');
                 }
-                $jsbase_path_route = AuxTools::getJSPathFromPHPDir(BASE_DIR);
-                $uri=$jsbase_path_route.DS."administrator".DS
-                        .JRoute::_('/index.php?option=com_fittizen');
+                $uri=JRoute::_('/index.php?option=com_fittizen',false);
                 $langobj="";
                 if(filter_has_var(INPUT_POST, 'langobj'))
                 {
@@ -55,7 +53,9 @@ class FittizenViewComplete extends JViewLegacy
                     $this->objname=null;
                     JFactory::getApplication()->enqueueMessage(
                         'COM_FITTIZEN_INVALID_PARAMETER', 'error');
-                    JFactory::getApplication()->redirect($uri);
+                    $con = new FittizenController();
+                    $con->setRedirect($uri);
+                    $con->redirect();
                 }
                 else 
                 {
@@ -65,7 +65,9 @@ class FittizenViewComplete extends JViewLegacy
                         $this->objname=null;
                         JFactory::getApplication()->enqueueMessage(
                             'COM_FITTIZEN_INVALID_PARAMETER', 'error');
-                        JFactory::getApplication()->redirect($uri);
+                        $con = new FittizenController();
+                        $con->setRedirect($uri);
+                        $con->redirect();
                     }
                 }
                 if($mode !== null && $this->objname !== null)
@@ -78,9 +80,12 @@ class FittizenViewComplete extends JViewLegacy
                             {
                                 JFactory::getApplication()->enqueueMessage(
                                     'COM_FITTIZEN_INVALID_PARAMETER', 'error');
-                                JFactory::getApplication()->redirect($uri);
+                                
+                                $con = new FittizenController();
+                                $con->setRedirect($uri);
+                                $con->redirect();
                             }
-                            $this->save($langobj);
+                            $this->save($this->objname);
                         break;
                     }
                 }
@@ -96,7 +101,6 @@ class FittizenViewComplete extends JViewLegacy
             {
                 $type='message';
                 $str = JText::_('COM_FITTIZEN_ELEMENT_UPDATE_SUCCESS');
-                $obj->setAttributes(filter_input_array(INPUT_POST));
                 if($obj->update()===false)
                 {
                     $type='error';

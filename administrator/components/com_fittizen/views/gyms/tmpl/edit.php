@@ -15,9 +15,9 @@ $location = new fittizen_locations($obj->location_id);
 $jspath = AuxTools::getJSPathFromPHPDir(BASE_DIR);
 $uri="./index.php?option=com_fittizen&view=gyms";
 ?>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY; ?>"></script>
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
+<link rel="stylesheet" href="../<?php echo LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
 <div class="span9">
 <h3 class="header-title">
 <?php
@@ -30,7 +30,7 @@ $(function(){
     $( "#location" ).autocomplete({
       source: function( request, response ) {
         $.ajax({
-          url:"<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_locations&format=json", 
+          url:"../index.php?option=com_fittizen&task=find_locations&format=json", 
           data:{address:$("#location").val()},
           dataType:"json",
           success: function( data ) {

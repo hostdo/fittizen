@@ -18,6 +18,7 @@ $input = JFactory::getApplication()->input->getArray();
 $min_age="";
 $max_age="";
 $gender_id =0;
+$lang_id = AuxTools::GetCurrentLanguageIDJoomla();
 if(isset($input['nicho']))
 {
     $json_nicho=$input['nicho'];
@@ -69,8 +70,8 @@ JFactory::getDocument()->addScriptDeclaration($script);
 		}
 	}
 </script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . TINY_INPUT_JS; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . TINY_INPUT_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . TINY_INPUT_JS; ?>"></script>
+<link rel="stylesheet" href="../<?php  echo LIBS . JS . TINY_INPUT_CSS; ?>" />
 <script type="text/javascript">
 
 
@@ -101,9 +102,9 @@ function setScreenAge(context)
 jQuery(document).ready(function() {
     
     jQuery( "#jform_nicho_nichos" ).tokenInput(
-         "<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_nichos&format=json",
+         "../index.php?option=com_fittizen&task=find_nichos&format=json&lang_id=<?php echo $lang_id ?>",
          {
-         preventDuplicates: true, queryParam:"needle", 
+         preventDuplicates: true, queryParam:"needle", tokenDelimiter:'|',
          prePopulate:<?php echo ($json_nicho); ?>, theme: "mac", 
          hintText:"<?php echo JText::_('COM_FITTIZEN_AUTO_COMPLETE_HINT_TEXT') ?>",
          noResultsText:"<?php echo JText::_('COM_FITTIZEN_AUTO_COMPLETE_NO_RESULTS_TEXT') ?>",
@@ -112,7 +113,7 @@ jQuery(document).ready(function() {
     );
     
     jQuery( "#jform_location" ).tokenInput(
-         "<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_locations&format=json",
+         "../index.php?option=com_fittizen&task=find_locations&format=json",
          {
          preventDuplicates: true, queryParam:"address",tokenDelimiter:'|',minChars:3, 
          prePopulate:<?php echo ($json_location); ?>, theme: "mac", propertyToSearch:"address",
@@ -243,7 +244,7 @@ jQuery(document).ready(function() {
                                 foreach($genders as $gender)
                                 {
                                     $sel = "";
-                                    if($gender->id == $gender_id)
+                                    if($gender->gender_id == $gender_id)
                                     {
                                         $sel = "selected";
                                     }

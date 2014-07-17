@@ -212,7 +212,11 @@ class FittizenController extends JControllerLegacy
         {
             $needle = filter_input(INPUT_GET, 'needle');
             $exclude = filter_input(INPUT_GET, 'exclude');
-            $lang_id=  AuxTools::GetCurrentLanguageIDJoomla();
+            $lang_id = filter_input(INPUT_GET, 'lang_id');
+            if($lang_id == "")
+            {
+                $lang_id=  AuxTools::GetCurrentLanguageIDJoomla();
+            }
             $objs=array();
             if($needle != "")
             {

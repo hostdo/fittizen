@@ -241,22 +241,44 @@ class bll_routine extends fittizen_routine
      * @param  integer $upper_limit higher limit on the query, it must be
      * an integer otherwise is going to be ignored
      * 
-     * @return fittizen_routine_lang array of language values
+     * @return bll_routine array of routines
      */
     public function checkIncomplete($DESC = true, $order_field = "id", 
             $lower_limit = null, $upper_limit = null)
     {
         $lval = new fittizen_routine_lang(-1);
-        $field = array(
-            array('description', '='),
-            array('url', '=')
-        );
-        $value = array(
-            array('', NULL),
-            array('', 'AND')
-        );
-        return $lval->findAll($field,$value,$DESC,
-            $order_field,$lower_limit, $upper_limit);
+        $main_table = $this->getTableName();
+        $objname = $this->getObjectName();
+        $lval_table = $lval->getTableName();
+        $db = $this->getProvider($this->getDebug());
+        $foreing_key = "routine_id";
+        $order_dir = 'ASC';
+        if($DESC === true)
+        {
+            $order_dir = "DESC";
+        }
+        $limit = "";
+        $order_by = $db->escape_string($order_field);
+        if($lower_limit !== null && $upper_limit !== null)
+        {
+            $lower_limit = $db->escape_string($lower_limit);
+            $upper_limit = $db->escape_string($upper_limit);
+            $limit = " LIMIT $lower_limit,$upper_limit";
+        }
+        $query = "SELECT D.id FROM `#__$main_table` as D INNER JOIN"
+               . " `#__$lval_table` as DL ON D.id = DL.$foreing_key "
+                . "where (DL.name = '' OR DL.Description='') OR "
+                . "0 NOT IN (select COUNT(lang_id) from `#__languages` where lang_id NOT IN "
+                . "(SELECT lang_id FROM `#__$lval_table` where $foreing_key = D.id) )"
+                . " ORDER BY `$order_by` $order_dir $limit";
+        $db->Query($query);
+        $res = array();
+        $objlist = $db->getNextObjectList();
+        foreach($objlist as $obj)
+        {
+            $res[]=new $objname($obj->id);
+        }
+        return $res;
     }
 }
 

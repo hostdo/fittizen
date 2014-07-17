@@ -14,9 +14,9 @@ $obj = new bll_gender($id);
 $jspath = AuxTools::getJSPathFromPHPDir(BASE_DIR);
 $uri="./index.php?option=com_fittizen&view=genders";
 ?>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY; ?>"></script>
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
+<link rel="stylesheet" href="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
 <div  class="span9">
     <h3 class="header-title">
     <?php

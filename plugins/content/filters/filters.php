@@ -76,7 +76,7 @@ class plgContentFilters extends JPlugin
                 if(isset($input['nichos']))
                 {
                     $nichos=$input['nichos'];
-                    $nichos_arr=explode(',', $nichos);
+                    $nichos_arr=explode('|', $nichos);
                     if($nichos_arr !== false)
                     {
                         foreach($nichos_arr as $nicho_str)
@@ -92,7 +92,7 @@ class plgContentFilters extends JPlugin
                 if(isset($input['location']))
                 {
                     $locations=$input['location'];
-                    $locations_arr=explode(',', $locations);
+                    $locations_arr=explode('|', $locations);
                     if($locations_arr !== false)
                     {
                         foreach($locations_arr as $location_str)
@@ -110,7 +110,12 @@ class plgContentFilters extends JPlugin
                 $gender="";
                 if(isset($input['gender']))
                 {
-                    $gender=$input['gender'];
+                    $gender=new fittizen_gender_lang($input['gender']);
+                    $gender=$gender->gender_id;
+                    if(!is_numeric($gender) || $gender <= 0)
+                    {
+                        $gender = NULL;
+                    }
                 }
                 if(isset($input['max_age']))
                 {
@@ -135,8 +140,11 @@ class plgContentFilters extends JPlugin
                                 bll_ads::add_location_banner($articleId, $obj_lo->id);
                             }
                             bll_ads::remove_filters_banner($articleId);
-                            bll_ads::add_filter_banner($articleId, $gender, $max_age, $min_age);
-                            
+                            $filter_banner=bll_ads::add_filter_banner($articleId, $gender, $max_age, $min_age);
+                            AuxTools::printr($input);
+                            AuxTools::printr($filter_banner);
+                            AuxTools::DatabaseDebugging();
+                            die;
 			}
 			catch (Exception $e)
 			{

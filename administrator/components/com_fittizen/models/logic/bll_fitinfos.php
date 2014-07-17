@@ -99,12 +99,30 @@ class bll_fitinfos extends fittizen_fitinfos
     }
     
     /**
+     * Validates values before inserting or update
+     */
+    private function pre_validate_fields()
+    {
+        $gender= new bll_gender($this->gender_id);
+        if($gender->id <= 0)
+        {
+            $this->gender_id = NULL;
+        }
+        $loc= new bll_locations($this->location_id);
+        if($loc->id <= 0)
+        {
+            $this->location_id = NULL;
+        }
+    }
+    
+    /**
      * Insert the object to the database
      *
      * @return bll_fitinfos not false on success.
      */
     public function insert() 
     {
+        $this->pre_validate_fields();
         return parent::insert();
     }
     
@@ -115,6 +133,7 @@ class bll_fitinfos extends fittizen_fitinfos
      */
     public function update()
     {
+        $this->pre_validate_fields();
         return parent::update();
     }
     

@@ -108,7 +108,7 @@ class FittizenViewLocations extends JViewLegacy
         {
             $jsbase_path_route = AuxTools::getJSPathFromPHPDir(BASE_DIR);
             $uri=$jsbase_path_route.DS."administrator".DS
-                        .JRoute::_('/index.php?option=com_fittizen&view=locations');
+                        .JRoute::_('./administrator/index.php?option=com_fittizen&view=locations');
             JFactory::getApplication()->redirect($uri);
         }
 }

@@ -10,9 +10,9 @@ $locations = $obj->findAll();
 
 ?>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY; ?>"></script>
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
+<link rel="stylesheet" href="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyA8oRtWdB_iU1tGQPrDPxcFgCEo2gBwO7o" ></script>
 <style type="text/css">
       html { height: 100% }
@@ -50,7 +50,7 @@ $locations = $obj->findAll();
           (function(marker, l_obj) {
             return function() {
               var html="<p>"+l_obj.address+"</p>";
-              html+="<a href=\"./index.php?option=com_fittizen&view=locations&mode=delete&id="+l_obj.id+"\"><span class=\"icon-cancel\"></span><?php echo JText::_("COM_FITTIZEN_REMOVE"); ?></a>";
+              html+="<a href=\"../administrator/index.php?option=com_fittizen&view=locations&mode=delete&id="+l_obj.id+"\"><span class=\"icon-cancel\"></span><?php echo JText::_("COM_FITTIZEN_REMOVE"); ?></a>";
               infowindow.setContent(html);
               
               infowindow.open(map, marker);
@@ -189,7 +189,7 @@ $locations = $obj->findAll();
 
 </div>
 <div id="dialog" class="span7" title="<?php echo JText::_('COM_FITTIZEN_SEARCH_LOCATION'); ?>">
-    <form action="./index.php?option=com_fittizen&view=locations" method="POST">
+    <form action="../administrator/index.php?option=com_fittizen&view=locations" method="POST">
         <div>
             <label>
                 <?php echo JText::_('COM_FITTIZEN_ADD'); ?>

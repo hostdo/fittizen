@@ -16,13 +16,14 @@ $data=array('objname'=>$this->objname);
 
 if($total <= 0)
 {
-    $jsbase_path_route = AuxTools::getJSPathFromPHPDir(BASE_DIR);
-    $uri=$jsbase_path_route.DS."administrator".
-            DS.JRoute::_('/index.php?option=com_fittizen');
+    $uri=JRoute::_('/administrator/index.php?option=com_fittizen',false);
                 
     JFactory::getApplication()->enqueueMessage(
-        'COM_FITTIZEN_NO_CONTENT_COMPLETE', 'error');
-    JFactory::getApplication()->redirect($uri);
+        'COM_FITTIZEN_NO_CONTENT_COMPLETE', 'warning');
+    
+    $con = new FittizenController();
+    $con->setRedirect($uri);
+    $con->redirect();
 }
 
 ?>
@@ -68,14 +69,14 @@ if($total <= 0)
                     <?php echo $obj->id; ?>
                 </td>
                 <td>
-                    <?php echo $obj->name; ?>
+                    <?php echo $obj->getLanguageValue($lang_id)->name; ?>
                 </td>
                 <td>
                     <form action="./index.php?option=com_fittizen&view=complete&layout=edit" method="POST">
                         <input type="hidden" name="id" value="<?php echo $obj->id; ?>" />
                         <input type="hidden" name="limitstart" value="<?php echo $limitstart ?>" />
                         <input type="hidden" name="obj" value="<?php echo $this->objname; ?>"/>
-                        <input type="hidden" name="langobj" value="<?php echo $obj->getObjectName(); ?>"/>
+                        <input type="hidden" name="langobj" value="<?php echo $obj->getLanguageValue($lang_id)->getObjectName(); ?>"/>
                         <button class="btn btn-small" type="submit">
                             <span class="icon-edit"></span>
                             <?php echo JText::_('COM_FITTIZEN_EDIT'); ?>

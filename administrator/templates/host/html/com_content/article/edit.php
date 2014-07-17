@@ -25,6 +25,7 @@ $params = $this->state->get('params');
 $app = JFactory::getApplication();
 $input = $app->input;
 $fdata=$this->form->getData()->toArray();
+$lang_id = AuxTools::GetCurrentLanguageIDJoomla();
 if(isset($fdata['nicho']))
 {
     $json_nicho=$fdata['nicho']['nichos'];
@@ -76,14 +77,14 @@ if (isset($this->item->attribs['show_urls_images_backend']) && $this->item->attr
 		}
 	};
 </script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . TINY_INPUT_JS; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . TINY_INPUT_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . TINY_INPUT_JS; ?>"></script>
+<link rel="stylesheet" href="../<?php echo LIBS . JS . TINY_INPUT_CSS; ?>" />
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
     
     jQuery( "#jform_nicho_nichos" ).tokenInput(
-         "<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_nichos&format=json",
+         "../index.php?option=com_fittizen&task=find_nichos&format=json&lang_id=<?php echo $lang_id ?>",
          {
          preventDuplicates: true, queryParam:"needle", 
          prePopulate:<?php echo ($json_nicho); ?>, theme: "mac",

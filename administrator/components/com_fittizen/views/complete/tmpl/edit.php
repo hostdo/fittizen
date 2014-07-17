@@ -20,25 +20,26 @@ $total=count($tmp->checkIncomplete(true,
 $tmp->getPrimaryKeyField()));
 if($total <= 0)
 {
-    $jsbase_path_route = AuxTools::getJSPathFromPHPDir(BASE_DIR);
-    $uri=$jsbase_path_route.DS."administrator".
-            DS.JRoute::_('/index.php?option=com_fittizen');
+    $uri=JRoute::_('/index.php?option=com_fittizen',false);
                 
     JFactory::getApplication()->enqueueMessage(
-        'COM_FITTIZEN_NO_CONTENT_COMPLETE', 'error');
-    JFactory::getApplication()->redirect($uri);
+        'COM_FITTIZEN_NO_CONTENT_COMPLETE', 'warning');
+    
+    $con = new FittizenController();
+    $con->setRedirect($uri);
+    $con->redirect();
 }
-$obj = new $langobj($id);
+$obj = new $this->objname($id);
 $jspath = AuxTools::getJSPathFromPHPDir(BASE_DIR);
 $uri="./index.php?option=com_fittizen&view=complete&obj=".$this->objname;
 ?>
-<script type="text/javascript" src="<?php echo DS.$jspath . LIBS . JS . JQUERY; ?>"></script>
-<script type="text/javascript" src="<?php echo DS.$jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo DS.$jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo LIBS . JS . JQUERY; ?>"></script>
+<script type="text/javascript" src="../<?php echo LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
+<link rel="stylesheet" href="../<?php echo LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
 <div class="span9">
 <h3 class="header-title">
 <?php
-echo JText::_('COM_FITTIZEN_DIETS');
+echo JText::_('COM_FITTIZEN_CONTENT');
 ?>
 </h3>
 </div>
@@ -46,18 +47,21 @@ echo JText::_('COM_FITTIZEN_DIETS');
     <?php 
         $form = Form::getInstance();
         $form->setLayout(FormLayouts::FORMS_UL_LAYOUT);
-        $language = new languages($obj->lang_id);
-        $lval = $obj;
-        $lang_label = "($language->title_native)";
-        $form->Label(JText::_('COM_FITTIZEN_NAME').$lang_label, 'name');
-        $form->Text('name', $lval->name, '', '', true);
-        $form->Label(JText::_('COM_FITTIZEN_DESCRIPTION').$lang_label, 'description');
-        $form->JEditor('description',
-                $lval->description, 350, 200, 60, 25);
-        $form->Label(JText::_('COM_FITTIZEN_URL').$lang_label, 'url');
-        $form->Text('url', $lval->url);
-        $form->Label(JText::_('COM_FITTIZEN_IMAGE').$lang_label, 'image');
-        $form->JMediaField('image', $lval->image);
+        foreach(languages::GetLanguages() as $language)
+        {
+            $lval = $obj->getLanguageValue($language->lang_id);
+            $lang_suffix = "_$language->lang_id";
+            $lang_label = "($language->title_native)";
+            $form->Label(JText::_('COM_FITTIZEN_NAME').$lang_label, 'name'.$lang_suffix);
+            $form->Text('name'.$lang_suffix, $lval->name, '', '', true);
+            $form->Label(JText::_('COM_FITTIZEN_DESCRIPTION').$lang_label, 'description'.$lang_suffix);
+            $form->JEditor('description'.$lang_suffix,
+                    $lval->description, 350, 200, 60, 25);
+            $form->Label(JText::_('COM_FITTIZEN_URL').$lang_label, 'url'.$lang_suffix);
+            $form->Text('url'.$lang_suffix, $lval->url);
+            $form->Label(JText::_('COM_FITTIZEN_IMAGE').$lang_label, 'image'.$lang_suffix);
+            $form->JMediaField('image'.$lang_suffix, $lval->image);
+        }
         $form->LinkButton(JText::_('COM_FITTIZEN_CANCEL'),
                 $uri,'cancel',
                 'cancel_btn', 'cancel_btn', 

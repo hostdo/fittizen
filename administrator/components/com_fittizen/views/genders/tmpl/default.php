@@ -73,10 +73,6 @@ echo JText::_('COM_FITTIZEN_TOTAL').":".$total;
                             <?php echo JText::_('COM_FITTIZEN_EDIT'); ?>
                         </button>
                     </form>
-                    <a class="btn btn-small" href="./index.php?option=com_fittizen&view=genders&mode=delete&id=<?php echo $obj->id; ?>">
-                        <span class="icon-trash"></span>
-                        <?php echo JText::_('COM_FITTIZEN_DELETE'); ?>
-                    </a>
                 </td>
             </tr>
             <?php endfor; ?>

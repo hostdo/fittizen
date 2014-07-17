@@ -206,11 +206,11 @@ foreach($types as $key=>$val)
 }
 $types = $ntypes;
 ?>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY; ?>"></script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . DATE_TIME_JS; ?>"></script>
-<script type="text/javascript" src="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
-<link rel="stylesheet" href="<?php echo $jspath . LIBS . JS . DATE_TIME_CSS; ?>" />
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY; ?>"></script>
+<script type="text/javascript" src="../<?php echo  LIBS . JS . DATE_TIME_JS; ?>"></script>
+<script type="text/javascript" src="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
+<link rel="stylesheet" href="../<?php echo  LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+<link rel="stylesheet" href="../<?php echo  LIBS . JS . DATE_TIME_CSS; ?>" />
 <script>  
   $(function() {
     $( "#tabs" ).tabs({active:<?php echo $active_tab; ?>});
@@ -218,7 +218,7 @@ $types = $ntypes;
     $( "#city" ).autocomplete({
           source: function( request, response ) {
             $.ajax({
-              url:"<?php echo $jspath.DS ?>index.php?option=com_fittizen&task=find_city&format=json", 
+              url:"../index.php?option=com_fittizen&task=find_city&format=json", 
               data:{city:$("#city").val()},
               dataType:"json",
               success: function( data ) {
@@ -359,7 +359,7 @@ echo JText::_('COM_FITTIZEN_STATISTICS');
         </div>
         <div class="span12">
             <h5><b><?php echo JText::_('COM_FITTIZEN_ACTIVE_ADS');?></b></h5>
-            <p><?php echo JText::_('COM_FITTIZEN_TRAINERS');?>: <?php echo bll_ads::get_active_ads(); ?> </p>
+            <p> <?php echo bll_ads::get_active_ads(); ?> </p>
         </div>
   </div>
   <div id="tabs-3">
