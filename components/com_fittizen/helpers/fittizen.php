@@ -55,7 +55,7 @@ abstract class FittizenHelper
         unset($temp['task']);
         $vars = http_build_query($temp);
         $user_creation_fail_redirect=$jinput->get("user_creation_fail_redirect",
-                "");
+                "/");
         $con = new FittizenController();
         $con->setRedirect($user_creation_fail_redirect."?".$vars);
         //validates if the username field is empty

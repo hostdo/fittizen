@@ -13,7 +13,6 @@
 defined('_JEXEC') or die('Restricted access');
 
 $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
-AuxTools::printr($_SESSION);
 ?>
 
 

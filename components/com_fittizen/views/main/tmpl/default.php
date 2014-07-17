@@ -14,8 +14,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
-$session = JFactory::getSession();
-$social_logout=(bool)$session->get('social_logout', false);
+$social_logout=!(bool)JFactory::getUser()->id;
 ?>
 
 <script>
@@ -23,6 +22,21 @@ $social_logout=(bool)$session->get('social_logout', false);
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
+    <?php if($social_logout == true){ ?>
+        if(exec == 0)
+        {
+            FB.logout(function(response) {
+                response.authResponse.accessToken="";
+                response.authResponse.expiresIn=0;
+                response.authResponse.signedRequest="";
+                response.authResponse.userID="";
+                // Reload the same page after logout
+                var FBAUTH=FB.Auth;
+            });
+            exec=1;
+            return;
+        }
+      <?php } ?>
     // The response object is returned with a status field that lets the
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
@@ -30,11 +44,13 @@ $social_logout=(bool)$session->get('social_logout', false);
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
       loginAPI();
-    } else if (response.status === 'not_authorized') {
+    } 
+    else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
       document.getElementById('status').innerHTML = 'Please log ' +
         'into this app.';
-    } else {
+    } 
+    else {
       // The person is not logged into Facebook, so we're not sure if
       // they are logged into this app or not.
       document.getElementById('status').innerHTML = 'Please log ' +
@@ -42,22 +58,15 @@ $social_logout=(bool)$session->get('social_logout', false);
     }
   }
 
-  <?php 
-  if($social_logout){
-  ?>
-      
-    FB.logout(function(response) {
-        // Person is now logged out in facebook
-    });
-  <?php 
-  }
-  ?>
+  var exec=0;
+  
 
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
+      
       statusChangeCallback(response);
     });
   }
