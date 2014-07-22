@@ -40,22 +40,52 @@ if(isset($objs['gender']))
     $gname = $objs['gender'];
 }
 $gender = bll_gender::find_gender($gname);
-?>
 
+?>
+<script type="text/javascript">
+    
+    jQuery(function(){
+        jQuery("#tabs-1").hide();
+        jQuery("#tabs-3").hide();
+        jQuery("#tabs-4").hide();
+        var elem=document.getElementById("atabs-2");
+        elem.className = "selected";
+    });
+function submitaccount(type)
+{
+    jQuery("#account_type").val(type);
+    jQuery("#tabs-2").hide();
+    jQuery("#tabs-3").show();
+    var elem=document.getElementById("atabs-3");
+    elem.className = "selected";
+    var elem2=document.getElementById("atabs-2");
+    elem2.className = "";
+}
+function confirm_info()
+{
+    jQuery("#tabs-3").hide();
+    jQuery("#tabs-4").show();
+    var elem=document.getElementById("atabs-4");
+    elem.className = "selected";
+    var elem2=document.getElementById("atabs-3");
+    elem2.className = "";
+}
+</script>
+   
 <form action="./index.php?option=com_fittizen&task=create_account" id="account_sel" method="POST">        
     <div id="tabs" class="span12">
-      <ul>
-        <li><a href="#tabs-1"><?php echo JText::_('COM_FITTIZEN_QUICK_REGISTER');  ?></a></li>
-        <li><a href="#tabs-2"><?php echo JText::_('COM_FITTIZEN_ACCOUNT_TYPE');  ?></a></li>
-        <li><a href="#tabs-3"><?php echo JText::_('COM_FITTIZEN_CONFIRM_COMPLETE_DATA');  ?></a></li>
-        <li><a href="#tabs-4"><?php echo JText::_('COM_FITTIZEN_INVITE_SHARE');  ?></a></li>
-      </ul>
+      <ol>
+        <li><a id="atabs-1" class="" onclick="return false;"><?php echo JText::_('COM_FITTIZEN_QUICK_REGISTER');  ?></a></li>
+        <li><a id="atabs-2" class="" onclick="return false;"><?php echo JText::_('COM_FITTIZEN_ACCOUNT_TYPE');  ?></a></li>
+        <li><a id="atabs-3" class="" onclick="return false;"><?php echo JText::_('COM_FITTIZEN_CONFIRM_COMPLETE_DATA');  ?></a></li>
+        <li><a id="atabs-4" class="" onclick="return false;"><?php echo JText::_('COM_FITTIZEN_INVITE_SHARE');  ?></a></li>
+      </ol>
       <div id="tabs-1">
         
       </div>
       <div id="tabs-2">
         <h2><?php echo JText::_('COM_FITTIZEN_SELECT_ACCOUNT_TYPE') ?></h2>
-        <input type="hidden" id="account_type" name="account_type" value=""/>
+            <input type="hidden" id="account_type" name="account_type" value=""/>
             <input type="hidden" id="params" name="params" value="<?php echo $params; ?>" />
             <div id="fittizen" class="span6">
                 <h3><?php echo JText::_('COM_FITTIZEN_FITTIZEN') ?></h3>
@@ -73,28 +103,18 @@ $gender = bll_gender::find_gender($gname);
             </div>
       </div>
       <div id="tabs-3">
-        
-      
+          <button type="button" onclick="return confirm_info();">
+            <?php echo JText::_('COM_FITTIZEN_CONTINUE') ?>
+          </button>
       </div>
       <div id="tabs-4">
-        <p><strong>Click this tab again to close the content pane.</strong></p>
-        <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+          <button class="no-style-button" type="submit">
+              <?php echo JText::_('COM_FITTIZEN_SKIP_THIS_STEP'); ?>
+          </button>
       </div>
     </div>
 </form>
 
-<script type="text/javascript">
-jQuery(document).ready(function() {
-    jQuery( '#tabs' ).tabs({
-      collapsible: true,
-      active: 1
-    });
-    //jQuery('#tabs').disable(0);
-});
-function submitaccount(type)
-{
-    jQuery("#account_type").val(type);
-    jQuery( "#tabs" ).tabs({active:jQuery( "#tabs" ).tabs( "option", "active" )+1});
-}
-</script>
-    
+     
+
+      

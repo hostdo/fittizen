@@ -13,8 +13,8 @@ class JConfig {
 	public $debug_lang = '0';
 	public $dbtype = 'mysqli';
 	public $host = 'localhost';
-	public $user = 'root';
-	public $password = '';
+	public $user = 'fittizen_user';
+	public $password = 'RL{R~HQ;vC?W';
 	public $db = 'fittizen_plugin';
 	public $dbprefix = 'mhitx_';
 	public $live_site = '';
@@ -54,8 +54,8 @@ class JConfig {
 	public $sef_suffix = '0';
 	public $unicodeslugs = '0';
 	public $feed_limit = '10';
-	public $log_path = 'C:\\wamp\\www\\fittizen_base/trunk/logs';
-	public $tmp_path = 'C:\\wamp\\www\\fittizen_base/trunk/tmp';
+	public $log_path = '/public_html/logs';
+	public $tmp_path = '/public_html/tmp';
 	public $lifetime = '15';
 	public $session_handler = 'database';
 }

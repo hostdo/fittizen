@@ -84,6 +84,9 @@ else
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<jdoc:include type="head" />
+        <link rel="stylesheet" href="./<?php echo LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
+        <script type="text/javascript" src="./<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>   
+        
 	<?php
 	// Use of Google Font
 	if ($this->params->get('googleFont'))
@@ -131,10 +134,6 @@ else
 	<!--[if lt IE 9]>
 		<script src="<?php echo $this->baseurl ?>/media/jui/js/html5.js"></script>
 	<![endif]-->
-        
-    <script type="text/javascript" src="./<?php echo  LIBS . JS . JQUERY_UI . JQUERY_UI_CORE; ?>"></script>
-    <link rel="stylesheet" href="./<?php echo LIBS . JS . JQUERY_UI . JQUERY_CSS . JQUERY_UI_CSS; ?>" />
-
 </head>
 
 <body class="site <?php echo $option

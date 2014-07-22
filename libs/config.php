@@ -16,10 +16,11 @@ else
     class config 
     {
 
-        public $user = 'root';
-	public $password = '';
-	public $db = 'fittizen_test';
-	public $dbprefix = '';
+        
+	public $user = 'fittizen_user';
+	public $password = 'RL{R~HQ;vC?W';
+	public $db = 'fittizen_plugin';
+	public $dbprefix = 'mhitx_';
         public $host = 'localhost';
         public $smtpuser = "";
         public $smtpsecure = "";
