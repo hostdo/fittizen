@@ -18,6 +18,7 @@ $social_logout=!(bool)JFactory::getUser()->id;
 ?>
 
 <script>
+  var exec=0;  
   // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
@@ -57,8 +58,6 @@ $social_logout=!(bool)JFactory::getUser()->id;
         'into Facebook.';
     }
   }
-
-  var exec=0;
   
 
   // This function is called when someone finishes with the Login
@@ -128,7 +127,6 @@ $social_logout=!(bool)JFactory::getUser()->id;
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-
 <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
 </fb:login-button>
 <span id="signinButton">
