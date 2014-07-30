@@ -11,7 +11,8 @@
  */
 // No direct access to this file
 defined('_JEXEC') or die('Restricted access');
-
+$user=JFactory::getUser();
+//$user->set('_errors', array());
 $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 ?>
 

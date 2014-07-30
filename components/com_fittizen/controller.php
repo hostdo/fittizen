@@ -21,7 +21,35 @@ jimport('joomla.application.component.controller');
  */
 class FittizenController extends JControllerLegacy
 {
-    
+        public function quick_register()
+        {
+            //create user
+            $jinput = JFactory::getApplication()->input;
+            $email= $jinput->get('email','');
+            if(FittizenHelper::validate_email($email)==false)
+            {
+                //redirect to user newsfeed
+                $msg = JText::_('COM_FITTIZEN_INVALID_EMAIL');
+                $this->setRedirect('/', $msg, 'error');
+                $this->redirect();
+            }
+            $params=http_build_query(array('email'=>$email));
+            $findedUser = FittizenHelper::findUser($email);
+            $type_url=JRoute::_(JText::_('COM_FITTIZEN_ACCOUNT_TYPE_SELECT_URI').'&params='.base64_encode($params),false);
+            $newsfeed_url=JRoute::_(JText::_('COM_FITTIZEN_NEWSFEED_URI'),false);
+            if($findedUser > 0)
+            {
+                //redirect to user newsfeed
+                $this->setRedirect($newsfeed_url);
+                $this->redirect();
+            }
+            else
+            {
+                //redirect to user account type selection
+                $this->setRedirect($type_url);
+                $this->redirect();
+            }
+        }
         public function facebook_login()
         {
             $objs =array();
@@ -32,11 +60,53 @@ class FittizenController extends JControllerLegacy
             {
                 $email = $objs['email'];
             }
+            if(FittizenHelper::validate_email($email)==false)
+            {
+                //redirect to user newsfeed
+                $msg = JText::_('COM_FITTIZEN_INVALID_EMAIL');
+                $this->setRedirect('/', $msg, 'error');
+                $this->redirect();
+            }
             $findedUser = FittizenHelper::findUser($email);
             $type_url=JRoute::_(JText::_('COM_FITTIZEN_ACCOUNT_TYPE_SELECT_URI').'&params='.base64_encode($params),false);
             $newsfeed_url=JRoute::_(JText::_('COM_FITTIZEN_NEWSFEED_URI'),false);
             
-            if($findedUser > 0)
+            if($findedUser > 0 && FittizenHelper::login($email) > 0)
+            {
+                //redirect to user newsfeed
+                $this->setRedirect($newsfeed_url);
+                $this->redirect();
+            }
+            else
+            {
+                //redirect to user account type selection
+                $this->setRedirect($type_url);
+                $this->redirect();
+            }
+        }
+        
+        public function googleplus_login()
+        {
+            $objs =array();
+            $params = filter_input(INPUT_GET, 'params');
+            parse_str($params,$objs);
+            $email=$name=$gname=$lastname=$middlename="";
+            if(isset($objs['email']))
+            {
+                $email = $objs['email'];
+            }
+            if(filter_var($email, FILTER_SANITIZE_EMAIL)==false)
+            {
+                //redirect to user newsfeed
+                $msg = JText::_('COM_FITTIZEN_INVALID_EMAIL');
+                $this->setRedirect('/', $msg, 'error');
+                $this->redirect();
+            }
+            $findedUser = FittizenHelper::findUser($email);
+            $type_url=JRoute::_(JText::_('COM_FITTIZEN_ACCOUNT_TYPE_SELECT_URI').'&params='.base64_encode($params),false);
+            $newsfeed_url=JRoute::_(JText::_('COM_FITTIZEN_NEWSFEED_URI'),false);
+            
+            if($findedUser > 0 && FittizenHelper::login($email) > 0)
             {
                 //redirect to user newsfeed
                 $this->setRedirect($newsfeed_url);
@@ -54,40 +124,42 @@ class FittizenController extends JControllerLegacy
         {
             //create user
             $jinput = JFactory::getApplication()->input;
-            $acctype= $jinput->get('account_type',null);
-            $params= base64_decode($jinput->get('params',""));
+            $acctype= $jinput->getString('account_type',null);
+            $params = base64_decode($jinput->get('params',""));
             $objs=array();
             parse_str($params,$objs);
-            $email=$name=$gname=$lastname=$middlename="";
-            if(isset($objs['email']))
+            $email = $jinput->getString('email','');
+            if(FittizenHelper::validate_email($email)==false)
             {
-                $email = $objs['email'];
+                //redirect to user newsfeed
+                $msg = JText::_('COM_FITTIZEN_INVALID_EMAIL');
+                $this->setRedirect('/', $msg, 'error');
+                $this->redirect();
             }
-            if(isset($objs['first_name']))
-            {
-                $name = $objs['first_name'];
-            }
-            if(isset($objs['last_name']))
-            {
-                $lastname = $objs['last_name'];
-            }
-            if(isset($objs['middle_name']))
-            {
-                $middlename = $objs['middle_name'];
-            }
-            if(isset($objs['gender']))
-            {
-                $gname = $objs['gender'];
-            }
-            $gender = bll_gender::find_gender($gname);
+            $name = $jinput->getString('name','');
+            $lastname = $jinput->getString('lastname','');
+            $gender = $jinput->get('gender','');
+            $objs['name']=$name;
+            $objs['email']=$email;
+            $objs['lastname']=$lastname;
+            $obj_gen=new fittizen_gender_lang($gender);
+            $objs['gender']=$obj_gen->name;
+            $params = http_build_query($objs);
             //create user
             $jinput->set('mail', $email);
             $jinput->set('username', $email);
-            $jinput->set('name', $name." ".$middlename." ".$lastname);
-            $uid=FittizenHelper::RegisterUser();
-            $profile = bll_fitinfos::getProfileByUserId($uid);
+            $jinput->set('name', $name." ".$lastname);
             $newsfeed = JRoute::_(JText::_('COM_FITTIZEN_NEWSFEED_URI'), false);
             $type_url=JRoute::_(JText::_('COM_FITTIZEN_ACCOUNT_TYPE_SELECT_URI').'&params='.base64_encode($params),false);
+            if($name=="")
+            {
+                //redirect to user newsfeed
+                $msg = JText::_('COM_FITTIZEN_PLEASE_ENTER_YOUR_NAME');
+                $this->setRedirect($type_url, $msg, 'error');
+                $this->redirect();
+            }
+            $uid=FittizenHelper::RegisterUser();
+            $profile = bll_fitinfos::getProfileByUserId($uid);
             if($profile->id > 0)
             {
                 JFactory::getApplication()->enqueueMessage(
@@ -97,10 +169,10 @@ class FittizenController extends JControllerLegacy
             else
             {
                 $attributes=array(
-                  'name'=> $name.' '.$middlename,
+                  'name'=> $name,
                   'last_name'=>$lastname,
                   'user_id'=>$uid,
-                  'gender_id'=>$gender->id,  
+                  'gender_id'=>$gender,  
                   'location_id'=>NULL
                 );
                 $profile=bll_fitinfos::create($attributes, $acctype);

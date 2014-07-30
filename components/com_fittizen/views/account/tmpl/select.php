@@ -27,9 +27,17 @@ if(isset($objs['first_name']))
 {
     $name = $objs['first_name'];
 }
+if(isset($objs['given_name']))
+{
+    $name = $objs['given_name'];
+}
 if(isset($objs['last_name']))
 {
     $lastname = $objs['last_name'];
+}
+if(isset($objs['family_name']))
+{
+    $lastname = $objs['family_name'];
 }
 if(isset($objs['middle_name']))
 {
@@ -48,13 +56,13 @@ $genders_arr = $genders->setCheckboxValues(
 ?>
 <script type="text/javascript">
     
-    jQuery(function(){
-        jQuery("#tabs-1").hide();
-        jQuery("#tabs-3").hide();
-        jQuery("#tabs-4").hide();
-        var elem=document.getElementById("atabs-2");
-        elem.className = "selected";
-    });
+jQuery(function(){
+    jQuery("#tabs-1").hide();
+    jQuery("#tabs-3").hide();
+    jQuery("#tabs-4").hide();
+    var elem=document.getElementById("atabs-2");
+    elem.className = "selected";
+});
 function submitaccount(type)
 {
     jQuery("#account_type").val(type);
@@ -75,7 +83,31 @@ function confirm_info()
     elem2.className = "";
 }
 
-// This is called with the results from from FB.getLoginStatus().
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallbackRet(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      return 1;
+    } 
+    else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      return 0;
+        
+    } 
+    else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      return -1;
+    }
+  }
+  
+  // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
@@ -133,7 +165,7 @@ function confirm_info()
   // These three cases are handled in the callback function.
 
   FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
+    statusChangeCallbackRet(response);
   });
 
   };
@@ -151,10 +183,9 @@ function confirm_info()
   // successful.  See statusChangeCallback() for when this call is made.
   function loginAPI() {
     console.log('Welcome!  Fetching your information.... ');
-    
     FB.ui({
         method: 'share',
-        href: 'https://developers.facebook.com/docs/',
+        href: 'http://fittizen.com/',
       } , function(response){
 
     });
@@ -162,8 +193,10 @@ function confirm_info()
 
 
 </script>
-   
-<form class="row-fluid" action="./index.php?option=com_fittizen&task=create_account" id="account_sel" method="POST">        
+<?php
+$params=base64_encode($params); 
+?>   
+<form class="row-fluid" action="/index.php?option=com_fittizen&task=create_account" id="account_sel" method="POST">        
     <div id="tabs" class="span12">
       <ol>
         <li><a id="atabs-1" class="" onclick="return false;"><?php echo JText::_('COM_FITTIZEN_QUICK_REGISTER');  ?></a></li>
@@ -177,7 +210,8 @@ function confirm_info()
       <div id="tabs-2">
         <h2><?php echo JText::_('COM_FITTIZEN_SELECT_ACCOUNT_TYPE') ?></h2>
             <input type="hidden" id="account_type" name="account_type" value=""/>
-            <input type="hidden" id="params" name="params" value="<?php echo $params; ?>" />
+            <input type="hidden" name="email" value="<?php echo $email; ?>" />
+            <input type="hidden"  id="params" name="params" value="<?php echo $params; ?>" />
             <div id="fittizen" class="span6">
                 <h3><?php echo JText::_('COM_FITTIZEN_FITTIZEN') ?></h3>
                 <p><?php echo JText::_('COM_FITTIZEN_FITTIZEN_DESC') ?></p>
@@ -209,12 +243,12 @@ function confirm_info()
           <?php 
             $form = Form::getInstance();
             $form->HTML('<div class="span6">');
-            $form->Label(JText::_('COM_FITTIZEN_GENDER'), 'gender');
-            $form->Radiobuttons('gender', $genders_arr);
-            $form->HTML('</div>');
-            $form->HTML('<div class="span6">');
             $form->Label(JText::_('COM_FITTIZEN_BIRTH_DATE'), 'birth_date');
             $form->Date('birth_date', $birth_date, 'birth_date');
+            $form->HTML('</div>');
+            $form->HTML('<div class="span6">');
+            $form->Label(JText::_('COM_FITTIZEN_GENDER'), 'gender');
+            $form->Radiobuttons('gender', $genders_arr);
             $form->HTML('</div>');
             echo $form->renderFields();
           ?>
@@ -224,7 +258,7 @@ function confirm_info()
           </button>
       </div>
       <div id="tabs-4">
-          <div id="fb-root"></div>
+          
           <div id="fb-share">
             <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
             </fb:login-button>

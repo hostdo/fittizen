@@ -16,7 +16,6 @@ $lang = new languages(AuxTools::GetCurrentLanguageIDJoomla());
 
 $social_logout=!(bool)JFactory::getUser()->id;
 ?>
-
 <script>
   var exec=0;  
   // This is called with the results from from FB.getLoginStatus().
@@ -37,7 +36,7 @@ $social_logout=!(bool)JFactory::getUser()->id;
             exec=1;
             return;
         }
-      <?php } ?>
+    <?php } ?>
     // The response object is returned with a status field that lets the
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
@@ -120,6 +119,131 @@ $social_logout=!(bool)JFactory::getUser()->id;
       jQuery("#social-login").submit();
     });
   }
+   
+  function disconnectGUser(access_token) 
+  {
+      var revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=' +
+      access_token;
+        // Realiza una solicitud GET asíncrona.
+        jQuery.ajax({
+          type: 'GET',
+          url: revokeUrl,
+          async: false,
+          contentType: "application/json",
+          dataType: 'jsonp',
+          success: function(nullResponse) {
+            // Lleva a cabo una acción ahora que el usuario está desconectado
+            // La respuesta siempre está indefinida.
+            document.getElementById('signinButton').setAttribute('style', '');
+          },
+          error: function(e) {
+            // Gestiona el error
+              console.log(e);
+            // Puedes indicar a los usuarios que se desconecten de forma manual si se produce un error
+            // https://plus.google.com/apps
+          }
+          });
+   }
+  
+  var gexec=0; 
+  /*
+   * Activado cuando el usuario acepta el inicio de sesión, cancela o cierra el
+   * cuadro de diálogo de autorización.
+   */
+  function loginFinishedCallback(authResult) {
+    if (authResult) {
+      if (authResult['error'] == undefined){
+          
+        // Autorizado correctamente
+        <?php if($social_logout == true){ ?>
+        if(gexec <= 0)
+        {
+            disconnectGUser(authResult['access_token']);
+            gexec=1;
+            return;
+        }
+        <?php } ?>  
+        gapi.auth.setToken(authResult); // Almacena el token recuperado.      
+        getProfile();                     // Activa la solicitud para obtener la dirección de correo electrónico.
+        
+      } 
+      else {
+        console.log('An error occurred');
+      }
+    } else {
+      console.log('Empty authResult');  // Se ha producido algún error
+    }
+  }
+
+  /*
+   * Inicia la solicitud del punto final userinfo para obtener la dirección de correo electrónico del
+   * usuario. Esta función se basa en gapi.auth.setToken que contiene un token
+   * de acceso de OAuth válido.
+   *
+   * Cuando se completa la solicitud, se activa getEmailCallback y recibe
+   * el resultado de la solicitud.
+   */
+  function getProfile(){
+    // Carga las bibliotecas oauth2 para habilitar los métodos userinfo.
+    gapi.client.load('oauth2', 'v2', function() {
+          var request = gapi.client.oauth2.userinfo.get();
+          request.execute(getProfileCallback);
+        });
+  }
+
+  function getProfileCallback(obj){
+    // Activa la solicitud para obtener la dirección de correo electrónico.
+    var form_html = '<input type="hidden" name="option" value="com_fittizen" /><input type="hidden" name="task" value="googleplus_login" />';
+    form_html+= '<input type="hidden" name="user_creation_fail_redirect" value="" />';
+    form_html+= '<input type="hidden" name="params" value="'+jQuery.param(obj)+'" />'; 
+    jQuery("#social-login").html(form_html);
+    jQuery("#social-login").submit();
+    document.getElementById('signinButton').setAttribute('style', 'display: none');
+  }
+
+  function toggleElement(id) {
+    var el = document.getElementById(id);
+    if (el.getAttribute('class') == 'hide') {
+      el.setAttribute('class', 'show');
+    } else {
+      el.setAttribute('class', 'hide');
+    }
+  }
+  
+  (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://apis.google.com/js/client:plusone.js';
+       var s = document.getElementsByTagName('script')[0]; 
+       s.parentNode.insertBefore(po, s);
+  })();
+  
+  jQuery(function(){
+     jQuery("#quick_register").click(function()
+     {
+        var form_html = '<input type="hidden" name="option" value="com_fittizen" /><input type="hidden" name="task" value="quick_register" />';
+        form_html+= '<input type="hidden" name="user_creation_fail_redirect" value="" />';
+        form_html+= '<input type="hidden" name="email" value="'+jQuery("#qemail").val()+'" />'; 
+        jQuery("#social-login").html(form_html);
+        jQuery("#social-login").submit(); 
+     });
+     jQuery("#qemail").click(function()
+     {
+        if(this.value === "<?php echo JText::_('COM_FITTIZEN_EMAIL') ?>")
+        {
+            this.value="";
+        }
+        return false;
+     });
+     jQuery("#qemail").blur(function()
+     {
+        if(this.value === "")
+        {
+            this.value="<?php echo JText::_('COM_FITTIZEN_EMAIL') ?>";
+        }
+        return false;
+     });
+  });
+  
 </script>
 
 <!--
@@ -127,54 +251,48 @@ $social_logout=!(bool)JFactory::getUser()->id;
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-<fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
-</fb:login-button>
-<span id="signinButton">
-  <span
-    class="g-signin"
-    data-callback="signinCallback"
-    data-clientid="<?php echo GPLUS_CLIENT_ID; ?>"
-    data-cookiepolicy="<?php echo GPLUS_COOKIE_POLICY; ?>"
-    data-requestvisibleactions="http://schemas.google.com/AddActivity"
-    data-scope="https://www.googleapis.com/auth/plus.login">
-  </span>
-</span>
-<div id="status">
+<div>
+    <div class="span7">
+        
+    </div>
+    <div class="span5">
+        <p class="main-header-message">
+            <?php echo JText::_('COM_FITTIZEN_GET_IN_SHAPE'); ?>
+        </p>
+        <p class="main-header-message">
+            <?php echo JText::_('COM_FITTIZEN_BECAME_A_FITTIZEN'); ?>
+        </p>
+        <p class="main-text-message">
+            <?php echo JText::_('COM_FITTIZEN_FITTIZEN_COMUNITY_DESCRIPTION'); ?>
+        </p>
+        <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
+        </fb:login-button>
+        <div id="signinButton">
+          <div class="g-signin"
+            data-callback="loginFinishedCallback"
+            data-height="short"
+            data-clientid="<?php echo GPLUS_CLIENT_ID; ?>"
+            data-cookiepolicy="<?php echo GPLUS_COOKIE_POLICY; ?>"
+            data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email">
+          </div>
+        </div>
+        <div id="status">
+        </div>
+
+        <form id="social-login" method="GET">
+        </form>
+        
+        <p class="main-text-message">
+            <?php echo JText::_('COM_FITTIZEN_CREATE_ACCOUNT_WITH_YOUR'); ?>
+        </p>
+        <div id="quick-register">
+            <input type="email" id="qemail" name="email" value="<?php echo JText::_('COM_FITTIZEN_EMAIL') ?>" />
+            <button id="quick_register"><?php echo JText::_('COM_FITTIZEN_REGISTER') ?></button>
+        </div>
+        <p class="main-tos-message">
+            <?php echo JText::_('COM_FITTIZEN_REGISTRY_AGREEMENT_TOS_PP'); ?>
+        </p>
+        <div id="block">
+        </div>  
+    </div>
 </div>
-
-<form id="social-login" method="GET">
-    
-</form>
-
-
-<div id="block">
-</div>
-
-<!-- Coloca este JavaScript asíncrono justo delante de la etiqueta </body> -->
-<script type="text/javascript">
-    function signinCallback(authResult) {
-    if (authResult['access_token']) {
-      // Autorizado correctamente
-      // Oculta el botón de inicio de sesión ahora que el usuario está autorizado, por ejemplo:
-      document.getElementById('signinButton').setAttribute('style', 'display: none');
-      var form_html = '<input type="hidden" name="option" value="com_fittizen" /><input type="hidden" name="task" value="facebook_login" />';
-      form_html+= '<input type="hidden" name="params" value="'+jQuery.param(authResult)+'" />'; 
-      jQuery("#social-login").html(form_html);
-      jQuery("#social-login").submit();
-    } 
-    else if (authResult['error']) {
-      // Se ha producido un error.
-      // Posibles códigos de error:
-      //   "access_denied": el usuario ha denegado el acceso a la aplicación.
-      //   "immediate_failed": no se ha podido dar acceso al usuario de forma automática.
-        console.log('There was an error: ' + authResult['error']);
-    }
-  }  
-    
-  (function() {
-   var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-   po.src = 'https://apis.google.com/js/client:plusone.js';
-   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
- })();
-</script>
-    

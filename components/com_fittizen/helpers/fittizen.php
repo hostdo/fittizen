@@ -7,26 +7,38 @@ defined('_JEXEC') or die;
  */
 abstract class FittizenHelper
 {  
+    public static function validate_email($email)
+    {
+        if(filter_var($email, FILTER_SANITIZE_EMAIL)==false)
+        {
+            return false;
+        }
+        return true;
+    }
+    
     public static function redirect_logged_in_user()
     {
         if(!JFactory::getUser()->guest)
         {
-            $type_url=JRoute::_(JText::_('COM_FITTIZEN_ACCOUNT_TYPE_SELECT_URI').'&params='.base64_encode($params),false);
             $newsfeed_url=JRoute::_(JText::_('COM_FITTIZEN_NEWSFEED_URI'),false);
             //login and assing fbid to profile
             $uid = JFactory::getUser()->id;
             $profile = bll_fitinfos::getProfileByUserId($uid);
             $con = new FittizenController();
-            if($profile->id <= 0)
+            if($profile->id > 0)
             {
-                //redirect to user type selection
-                $con->setRedirect($type_url);
+                //redirect to user newsfeed
+                $con->setRedirect($newsfeed_url);
                 $con->redirect();
             }
             else
             {
+                JFactory::getApplication()->logout($uid);
+                $session = JFactory::getSession();
+                $session->destroy();
+                $session->start();
                 //redirect to user newsfeed
-                $con->setRedirect($newsfeed_url);
+                $con->setRedirect(JRoute::_('/',false), JText::_('COM_FITTIZEN_PROFILE_DOES_NOT_EXISTS'));
                 $con->redirect();
             }
             return true;
@@ -53,14 +65,15 @@ abstract class FittizenHelper
         $value = $jinput->getString("username", "");
         $temp=$jinput->getArray();
         unset($temp['task']);
+        unset($temp['option']);
         $vars = http_build_query($temp);
         $user_creation_fail_redirect=$jinput->get("user_creation_fail_redirect",
-                "/");
+                $language->sef."/");
         $con = new FittizenController();
         $con->setRedirect($user_creation_fail_redirect."?".$vars);
         //validates if the username field is empty
         if ($value == "") {
-          JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_INVALID_USERNAME"), 'error');
+          $con->setMessage(JText::_("COM_FITTIZEN_INVALID_USERNAME"), 'error');
           $con->redirect();
           return false;
         }
@@ -69,11 +82,11 @@ abstract class FittizenHelper
           $isNew = true;
           $us = JFactory::getUser();
           //Checking if user exist
-          $r = $this->findUser($email);
+          $r = self::findUser($email);
 
           //if user exists we cannot procced
           if ($r > 0) {
-            JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_EMAIL_EXISTS"), 'error');
+            $con->setMessage(JText::_("COM_FITTIZEN_EMAIL_EXISTS"), 'error');
             $con->redirect();
             return false;
           }
@@ -81,13 +94,13 @@ abstract class FittizenHelper
           $cache->clean();
         } else {
           $us = JFactory::getUser($id);
-          $r = $this->findUser($email);
+          $r = self::findUser($email);
           //if user does not exists we cannot procced
           if ($r > 0) {
             $session = JFactory::getSession();
             $session->destroy();
             $session->start();
-            JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_LOGOUT_CLEAN_COOKIES"), 'error');
+            $con->setMessage(JText::_("COM_FITTIZEN_LOGOUT_CLEAN_COOKIES"), 'error');
             $con->redirect();
             return false;
           }
@@ -106,7 +119,7 @@ abstract class FittizenHelper
         //password fields must not be an empty string
         if ($pass == "" || $pass2 == "")
         {
-            JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_ERROR_CREATING_PASSWORD"), 'error');
+            $con->setMessage(JText::_("COM_FITTIZEN_ERROR_CREATING_PASSWORD"), 'error');
             $con->redirect();
             return false;
         }
@@ -115,42 +128,36 @@ abstract class FittizenHelper
         $pass = $crypt . ':' . $salt;
         $us->password = $pass;
         if ($us->id <= 0)
-          $us->password_clear = $jinput->getString("password", "");;
-
-
+        {
+            $us->password_clear = $jinput->getString("password", "");
+        }
         $us->email = $email;
-        $re = '/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/';
-        if(preg_match($re, $us->email) !==1)
+        if(self::validate_email($us->email)==false)
         {
             $session = JFactory::getSession();
             $session->destroy();
             $session->start();
-            JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_INVALID_EMAIL"), 'error');
+            $con->setMessage(JText::_("COM_FITTIZEN_INVALID_EMAIL"), 'error');
             $con->redirect();
             return false;
         }
         $us->name = $jinput->getString("name", "");
 
-        if ($us->name == "" || $us->email == "")
+        if ($us->username == "" || $us->email == "")
         {
             $session = JFactory::getSession();
             $session->destroy();
             $session->start();
-            JFactory::getApplication()->enqueueMessage(JText::_("COM_FITTIZEN_INVALID_USERNAME_EMAIL"), 'error');
+            $con->setMessage(JText::_("COM_FITTIZEN_INVALID_USERNAME_EMAIL"), 'error');
             $con->redirect();
             return false;
         }
-
         //end of getting profile info
         if (!$us->save()) {
-          $session = JFactory::getSession();
-          $session->destroy();
-          $session->start();
           $con->setMessage(JText::sprintf('COM_FITTIZEN_REGISTRATION_SAVE_FAILED', $us->getError()));
           $con->redirect();
           return false;
         }
-
         // Compile the notification mail values.
         $data = $us->getProperties();
         $config = new JConfig();
@@ -172,13 +179,13 @@ abstract class FittizenHelper
                 $data['mailfrom'], $data['fromname'], 
                 $data['email'], $emailSubject, $emailBody);
         $mailer->ClearAllRecipients();
-        $this->setRedirect("");
+        
         if ($isNew == true) {
           $dbo = new dbprovider();
           $query = "INSERT INTO `#__user_usergroup_map` (`user_id`, `group_id`) VALUES($us->id, $regis_group) ";
           $dbo->Query($query);
         }
-        JFactory::getApplication()->enqueueMessage(JText::_('COM_FITTIZEN_ACCOUNT_CREATED'));
+        //$con->setMessage(JText::_('COM_FITTIZEN_ACCOUNT_CREATED'));
         return $us->id;
     }
         
@@ -212,11 +219,9 @@ abstract class FittizenHelper
               $jdb = JFactory::getDbo();
               // Mark the user as logged in
               $user->set('guest', 0);
-
+              
               // Register the needed session variables
               $session = JFactory::getSession();
-              Auxtools::printr($session->getId());
-              
               $session->set('user', $user);
               // Check to see the the session already exists.
               //$app->checkSession();
