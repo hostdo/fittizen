@@ -1668,7 +1668,7 @@ class bll_fitinfos extends fittizen_fitinfos
         {
             $db = $this->getProvider($this->getDebug());
             $query="SELECT TI.id as id, TI.main as main, TI.panoramic_main as panoramic_main "
-                 . "FROM `fittizen_timeline` as T INNER JOIN `fittizen_timeline_images` as TI "
+                 . "FROM `#__fittizen_timeline` as T INNER JOIN `#__fittizen_timeline_images` as TI "
                  . "ON T.id = TI.timeline_id "
                  . "where T.fitinfo_id = '$this->id' AND TI.main = '1'";
             $db->Query($query);
@@ -1706,7 +1706,7 @@ class bll_fitinfos extends fittizen_fitinfos
         {
             $db = $this->getProvider($this->getDebug());
             $query="SELECT TI.id as id, TI.main as main, TI.panoramic_main as panoramic_main "
-                 . "FROM `fittizen_timeline` as T INNER JOIN `fittizen_timeline_images` as TI "
+                 . "FROM `#__fittizen_timeline` as T INNER JOIN `#__fittizen_timeline_images` as TI "
                  . "ON T.id = TI.timeline_id "
                  . "where T.fitinfo_id = '$this->id' AND TI.panoramic_main = '1'";
             $db->Query($query);
@@ -1942,8 +1942,8 @@ class bll_fitinfos extends fittizen_fitinfos
         }
         $query="SELECT DISTINCT FIT.id as id, "
             . "FRIEND.created_date as friends_since "
-            . "  FROM `fittizen_fitinfo_friends` as FRIEND "
-            . "INNER JOIN `fittizen_fitinfos` FIT ON "
+            . "  FROM `#__fittizen_fitinfo_friends` as FRIEND "
+            . "INNER JOIN `#__fittizen_fitinfos` FIT ON "
             . "FRIEND.fitinfo_id = FIT.id where FRIEND.fitinfo_id = $fitinfo_id AND FRIEND.block = '0' AND FRIEND.accepted = '0'"
             . " ORDER BY `$order_by` $order_dir $limit";
         
