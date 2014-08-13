@@ -262,9 +262,12 @@ class bll_fitinfos extends fittizen_fitinfos
     public function set_permissions($attrs)
     {
         $obj = new fittizen_fitinfo_permissions(-1);
+        $obj->fitinfo_id = $this->id;
         $obj->setAttributes($attrs);
-        if($this->get_permissions()->id > 0)
+        $old_perm=$this->get_permissions();
+        if($old_perm->id > 0)
         {
+            $obj->id = $old_perm->id;
             return $obj->update();
         }
         return $obj->insert();

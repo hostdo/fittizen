@@ -47,14 +47,12 @@ $social_logout=!(bool)JFactory::getUser()->id;
     } 
     else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into this app.';
+      
     } 
     else {
       // The person is not logged into Facebook, so we're not sure if
       // they are logged into this app or not.
-      document.getElementById('status').innerHTML = 'Please log ' +
-        'into Facebook.';
+      
     }
   }
   
@@ -200,15 +198,6 @@ $social_logout=!(bool)JFactory::getUser()->id;
     jQuery("#social-login").submit();
     document.getElementById('signinButton').setAttribute('style', 'display: none');
   }
-
-  function toggleElement(id) {
-    var el = document.getElementById(id);
-    if (el.getAttribute('class') == 'hide') {
-      el.setAttribute('class', 'show');
-    } else {
-      el.setAttribute('class', 'hide');
-    }
-  }
   
   (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
@@ -242,6 +231,42 @@ $social_logout=!(bool)JFactory::getUser()->id;
         }
         return false;
      });
+     
+     jQuery("#social-login-with").click(function(){
+        var type=jQuery("#social").val();
+        switch(type)
+        {
+            case "fb":
+                FB.login(function(response) {
+                    statusChangeCallback(response);
+                });
+            break;
+            case "gp":
+                var r_params = {
+                client_id: '<?php echo GPLUS_CLIENT_ID; ?>',
+                immediate:false,
+                scope: "https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email"
+                };
+                gapi.auth.authorize(r_params, loginFinishedCallback);
+            break;
+        }
+     });
+     
+     jQuery("#select-social").change(function(){
+        jQuery("#social").val(this.value);
+        var type=jQuery("#social").val();
+        switch(type)
+        {
+            case "fb":
+                jQuery("#select-social").attr("class","sel-fb");
+                jQuery("#social-login-with").attr("class","fb-login-with");
+            break;
+            case "gp":
+                jQuery("#select-social").attr("class","sel-gp");
+                jQuery("#social-login-with").attr("class","gp-login-with");
+            break;
+        }
+     });
   });
   
 </script>
@@ -251,48 +276,67 @@ $social_logout=!(bool)JFactory::getUser()->id;
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-<div>
-    <div class="span7">
-        
-    </div>
-    <div class="span5">
-        <p class="main-header-message">
-            <?php echo JText::_('COM_FITTIZEN_GET_IN_SHAPE'); ?>
-        </p>
-        <p class="main-header-message">
-            <?php echo JText::_('COM_FITTIZEN_BECAME_A_FITTIZEN'); ?>
-        </p>
-        <p class="main-text-message">
-            <?php echo JText::_('COM_FITTIZEN_FITTIZEN_COMUNITY_DESCRIPTION'); ?>
-        </p>
-        <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
-        </fb:login-button>
-        <div id="signinButton">
-          <div class="g-signin"
-            data-callback="loginFinishedCallback"
-            data-height="short"
-            data-clientid="<?php echo GPLUS_CLIENT_ID; ?>"
-            data-cookiepolicy="<?php echo GPLUS_COOKIE_POLICY; ?>"
-            data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email">
-          </div>
-        </div>
-        <div id="status">
-        </div>
+<div class="bg_login-reg">
+	<div class="textu">
+		<div class="container">
+		    <div class="span7">
 
-        <form id="social-login" method="GET">
-        </form>
-        
-        <p class="main-text-message">
-            <?php echo JText::_('COM_FITTIZEN_CREATE_ACCOUNT_WITH_YOUR'); ?>
-        </p>
-        <div id="quick-register">
-            <input type="email" id="qemail" name="email" value="<?php echo JText::_('COM_FITTIZEN_EMAIL') ?>" />
-            <button id="quick_register"><?php echo JText::_('COM_FITTIZEN_REGISTER') ?></button>
-        </div>
-        <p class="main-tos-message">
-            <?php echo JText::_('COM_FITTIZEN_REGISTRY_AGREEMENT_TOS_PP'); ?>
-        </p>
-        <div id="block">
-        </div>  
-    </div>
+		    </div>
+		    <div class="span5">
+		        <h1 class="main-header-message">
+		            <?php echo JText::_('COM_FITTIZEN_GET_IN_SHAPE'); ?>
+		        </h1>
+		        <h1 class="main-header-message">
+		            <?php echo JText::_('COM_FITTIZEN_BECAME_A_FITTIZEN'); ?>
+		        </h1>
+		        <p class="main-text-message">
+		            <?php echo JText::_('COM_FITTIZEN_FITTIZEN_COMUNITY_DESCRIPTION'); ?>
+		        </p>
+                        <div id="buttons">
+                            <input type="hidden" value="fb" name="social" id="social" />
+                            <button type="button" id="social-login-with" class="fb-login-with">
+                                <?php echo JText::_('COM_FITTIZEN_LOG_IN_WITH'); ?>
+                            </button>
+                            <select id="select-social" class="sel-fb">
+                                <option value="fb" class="fb-login-with-opt" selected>
+                                    <?php echo JText::_('COM_FITTIZEN_FACEBOOK'); ?>
+                                </option>
+                                <option value="gp" class="gp-login-with-opt">
+                                        <?php echo JText::_('COM_FITTIZEN_GPLUS'); ?>
+                                </option>
+                            </select>
+                        </div>
+		        <div class="hide">
+                            <fb:login-button scope="public_profile,email,user_likes,user_likes" onlogin="checkLoginState();">
+                            </fb:login-button>
+                              <div class="g-signin"
+                                data-callback="loginFinishedCallback"
+                                data-height="short"
+                                data-clientid="<?php echo GPLUS_CLIENT_ID; ?>"
+                                data-cookiepolicy="<?php echo GPLUS_COOKIE_POLICY; ?>"
+                                data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email">
+                              </div>
+		        </div>
+		        <div id="status">
+		        </div>
+
+		        <form id="social-login" method="GET">
+		        </form>
+				<hr/>
+		        <p class="main-text-message">
+		            <?php echo JText::_('COM_FITTIZEN_CREATE_ACCOUNT_WITH_YOUR'); ?>
+		        </p>
+		        <div id="quick-register">
+		            <input type="email" id="qemail" name="email" value="<?php echo JText::_('COM_FITTIZEN_EMAIL') ?>" />
+		            <button id="quick_register"><?php echo JText::_('COM_FITTIZEN_REGISTER') ?></button>
+		        </div>
+		        <small class="main-tos-message">
+		            <?php echo JText::_('COM_FITTIZEN_REGISTRY_AGREEMENT_TOS_PP'); ?>
+		        </small>
+		        <div id="block">
+		        </div>  
+		    </div>
+		</div>
+	</div>
 </div>
+	

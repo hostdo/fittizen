@@ -46,6 +46,36 @@ abstract class FittizenHelper
         return false;
     }
     
+    public static function change_password($pass,$pass2)
+    {
+        $app=JFactory::getApplication();
+        if(($pass != $pass2))
+        {
+            $app->enqueueMessage(JText::_('COM_FITTIZEN_TYPE_SAME_PASSWORD'),'error');
+            return false;
+        }
+        $user=JFactory::getUser();
+        // Load the users plugin group.
+        JPluginHelper::importPlugin('user');
+        // Null the user groups so they don't get overwritten
+        $user->groups = null;
+        $data['password']=$pass;
+        $data['password2']=$pass2;
+        // Bind the data.
+        if (!$user->bind($data))
+        {
+                $app->enqueueMessage(JText::sprintf('COM_USERS_PROFILE_BIND_FAILED', $user->getError()));
+                return false;
+        }
+        // Store the data.
+        if (!$user->save())
+        {
+                $app->enqueueMessage($user->getError());
+                return false;
+        }
+        return true;
+    }
+    
     public static function RegisterUser()
     {
         jimport( 'joomla.user.helper' );

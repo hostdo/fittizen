@@ -1,4 +1,5 @@
 <?php
+define('_EXEC', 1);
 if (!defined('BASE_DIR'))
     define('BASE_DIR', dirname(dirname(__FILE__)));
 
@@ -12,7 +13,11 @@ define('FB_API_ID', '1442208259376401');
 define('GPLUS_CLIENT_ID', '221125422497-d92qpjo0a6bl5rjhs335ptll3dsv3tk7.apps.googleusercontent.com');
 define('GPLUS_COOKIE_POLICY', 'none');
 
-define('_EXEC', 1);
+define('TW_API_ID', 'i19m7agwF6KMEtks6D1ND4Got');
+define('TW_API_SECRET', '1roRmAooshpvBuoTwur3qmEwg9vO9q84O1cxTolZf5C3LPGKJy');
+define('TW_ACCESS_TOKEN', '119918291-ijfN9WF54SvH5gYLVhrTsbMsTUH5rMvyDERxZyK3');
+define('TW_ACCESS_SECRET', 'Xwtx4RSYLXg2fiOFtFg1EvA8UeeJetCYP0xY5kKym3UxY');
+
 define('JS_PREFOLDER', './');
 define('CONSTANTS', 'Constants.php');
 define('PHP_EXT', '.php');
